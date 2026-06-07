@@ -1,0 +1,7 @@
+.jdk/
+.idea/
+dsr-backend/target/
+*.log
+node_modules/
+.vscode/
+iit-pro-1-main/uploads/
