@@ -20,6 +20,7 @@ const MIME_TYPES = {
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.gif': 'image/gif',
   '.svg': 'image/svg+xml',
   '.ico': 'image/x-icon'
@@ -28,6 +29,14 @@ const MIME_TYPES = {
 const PROJECTS_FILE = path.join(__dirname, 'projects.json');
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 const workflowHistory = {};
+
+function cacheHeaderFor(ext) {
+  if (ext === '.html') return 'public, max-age=60';
+  if (['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'].includes(ext)) {
+    return 'public, max-age=31536000, immutable';
+  }
+  return 'public, max-age=3600';
+}
 
 function normalizeProject(project = {}) {
   const id = project.id || Date.now();
@@ -499,7 +508,10 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(fullPath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
-    res.writeHead(200, { 'Content-Type': contentType });
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': cacheHeaderFor(ext)
+    });
     
     const stream = fs.createReadStream(fullPath);
     stream.on('error', (streamErr) => {

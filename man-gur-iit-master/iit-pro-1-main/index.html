@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Link only the self-contained premium theme with version parameter to prevent browser caching -->
   <link rel="stylesheet" href="css/premium-theme.css?v=2.1">
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js"></script>
 </head>
 <body class="premium-body intro-active">
   
@@ -19,7 +19,7 @@
   <div class="interactive-grid-bg"></div>
   
   <!-- Faded Background Watermark Logo -->
-  <img class="global-watermark" src="logo/CoE-SEnSRS.jpeg" alt="">
+  <img class="global-watermark" src="logo/CoE-SEnSRS.jpeg" alt="" loading="lazy" decoding="async">
 
   <!-- Ambient Gradient Glow Orbs -->
   <div class="ambient-glow">
@@ -30,7 +30,7 @@
 
   <!-- Scroll-Driven Morphing Branding (Logo + Title Text) -->
   <div class="intro-branding" id="intro-logo">
-    <img class="intro-logo-img" src="logo/CoE-SEnSRS.jpeg" alt="IIT Ropar DSR Logo">
+    <img class="intro-logo-img" src="logo/CoE-SEnSRS.jpeg" alt="IIT Ropar DSR Logo" decoding="async" fetchpriority="high">
     <div class="intro-text">
       <span class="let">D</span>
       <span class="let">S</span>
@@ -63,7 +63,7 @@
       <!-- Morphing logo container aligns to the left padding automatically -->
       <div class="nav-links-hub" aria-label="Primary navigation">
         <a class="nav-brand-link" href="home.html">
-          <img class="nav-brand-logo-img" src="logo/CoE-SEnSRS.jpeg" alt="DSR Logo">
+          <img class="nav-brand-logo-img" src="logo/CoE-SEnSRS.jpeg" alt="DSR Logo" decoding="async">
           <span class="nav-brand-logo-text">DSR REPORT</span>
         </a>
         <a class="nav-link-item" href="login.html">Workflow</a>
@@ -103,7 +103,7 @@
           <div class="preview-glow-bg"></div>
           <div class="hero-logo-container">
             <div class="hero-logo-title">DSR</div>
-            <img class="hero-logo-img" src="logo/CoE-SEnSRS.jpeg" alt="IIT Ropar DSR Logo">
+            <img class="hero-logo-img" src="logo/CoE-SEnSRS.jpeg" alt="IIT Ropar DSR Logo" decoding="async">
           </div>
         </div>
 
@@ -115,7 +115,7 @@
   <footer class="home-footer">
     <div>
       <a class="home-brand footer-brand" href="#">
-        <img src="logo/CoE-SEnSRS.jpeg" alt="IIT Ropar Logo">
+        <img src="logo/CoE-SEnSRS.jpeg" alt="IIT Ropar Logo" loading="lazy" decoding="async">
         <span style="font-weight: 800; color: var(--p-accent);">COE-SENSRS</span>
       </a>
       <p style="margin-top: 10px; opacity: 0.8; font-size: 0.9rem;">IIT Ropar Centre of Excellence on Secured Way For Reports</p>

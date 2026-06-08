@@ -88,11 +88,9 @@ async function initApp() {
     console.error('Failed to load reports for notifications', err);
   }
 
-  renderDashboard(); renderProjects(); renderChapters(); renderPlates();
+  renderDashboard();
+  renderProjects();
   if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
-  initDemandTable(); initSummaryTable(); initAuctionTable();
-  renderSignatures(); renderFinalChecklist();
-  renderGraphs(); // Ensure graphs exist so plates can link to them
   document.getElementById('badge-projs').textContent = S.projects.length;
   document.getElementById('sb-pending-sigs').textContent = S.signatures.filter(s => !s.signed).length;
 }
@@ -445,7 +443,12 @@ function showView(id, btn, push = true) {
 
   if (id === 'esign') renderSignatures();
   if (id === 'generate') renderFinalChecklist();
-  if (id === 'plates') renderPlates(); // Re-render in case new graphs were added
+  if (id === 'chapters') renderChapters();
+  if (id === 'plates') renderPlates();
+  if (id === 'graphs') renderGraphs();
+  if (id === 'demand-table') initDemandTable();
+  if (id === 'summary-table') initSummaryTable();
+  if (id === 'auction-table') initAuctionTable();
   if (id === 'workflow') updateWorkflowDistrictUI();
   if (id === 'projects' && typeof refreshProjectsFromBackend === 'function') {
     refreshProjectsFromBackend(true).catch(err => console.error('Project refresh failed', err));
@@ -515,11 +518,25 @@ function goBackView() {
   }
 }
 
-function initLucide() {
-  if (window.lucide) {
-    window.lucide.createIcons();
-  }
+let lucideRenderQueued = false;
+function initLucide(root) {
+  if (!window.lucide || lucideRenderQueued) return;
+  lucideRenderQueued = true;
+  requestAnimationFrame(() => {
+    lucideRenderQueued = false;
+    if (!window.lucide) return;
+    try {
+      if (root && root.querySelector) window.lucide.createIcons({ nodes: root.querySelectorAll('i[data-lucide]') });
+      else window.lucide.createIcons();
+    } catch (err) {
+      window.lucide.createIcons();
+    }
+  });
 }
+
+window.addEventListener('load', () => {
+  if (window.initLucide) window.initLucide();
+});
 
 function updateSidebarToggleVisibility() {
   const toggleBtn = document.getElementById('tb-sidebar-toggle');

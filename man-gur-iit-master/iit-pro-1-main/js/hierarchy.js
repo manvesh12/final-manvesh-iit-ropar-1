@@ -453,11 +453,24 @@ function updateRolePermissionUI() {
   if (roleText && S?.user) roleText.textContent = getRoleRule().label;
 }
 
-function enforceActiveViewHierarchy() {
+function enforceActiveViewHierarchy(force = false) {
   const activeView = document.querySelector('.view.active');
   if (!activeView || typeof S === 'undefined' || !S.user) return;
 
   const viewId = activeView.id.replace('view-', '');
+  const rbacSignature = [
+    getBackendRole(),
+    viewId,
+    S.activeProject?.id || '',
+    activeView.querySelectorAll('input, textarea, select, [contenteditable], button, label.btn, .upload-zone').length,
+    activeView.querySelectorAll('tbody tr').length,
+    activeView.querySelectorAll('td, th').length
+  ].join('|');
+  if (!force && activeView.dataset.rbacSignature === rbacSignature) {
+    updateRolePermissionUI();
+    return;
+  }
+
   const canEdit = canEditView(viewId);
   const label = `${getRoleRule().label} cannot edit this section`;
 
@@ -490,6 +503,7 @@ function enforceActiveViewHierarchy() {
   }
 
   updateRolePermissionUI();
+  activeView.dataset.rbacSignature = rbacSignature;
 }
 
 function ensureRbacStyles() {
