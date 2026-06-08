@@ -91,8 +91,10 @@ async function initApp() {
   renderDashboard();
   renderProjects();
   if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
-  document.getElementById('badge-projs').textContent = S.projects.length;
-  document.getElementById('sb-pending-sigs').textContent = S.signatures.filter(s => !s.signed).length;
+  const projectBadge = document.getElementById('badge-projs');
+  if (projectBadge) projectBadge.textContent = S.projects.length;
+  const pendingSigsBadge = document.getElementById('sb-pending-sigs');
+  if (pendingSigsBadge) pendingSigsBadge.textContent = S.signatures.filter(s => !s.signed).length;
 }
 
 window.scrollToSection = function (viewId, sectionId, parentBtn) {
@@ -380,6 +382,7 @@ function showView(id, btn, push = true) {
   } else {
     document.body.classList.remove('view-dashboard-active');
   }
+  document.body.classList.toggle('view-projects-active', id === 'projects');
 
   // Toggle display of back button based on history
   const backBtn = document.getElementById('tb-back-btn');

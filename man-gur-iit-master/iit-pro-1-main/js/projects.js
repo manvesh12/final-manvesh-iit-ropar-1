@@ -86,7 +86,7 @@ function dashPortalToast(message, type = 'info') {
 }
 
 function dashFocusSearch() {
-  const input = document.getElementById('dash-portal-search');
+  const input = document.getElementById('dash-portal-search') || document.getElementById('projects-portal-search') || document.getElementById('tb-portal-search');
   if (!input) return;
   input.focus();
   input.select();
@@ -94,7 +94,7 @@ function dashFocusSearch() {
 
 function dashRunSearch(event) {
   if (event && event.key !== 'Enter') return;
-  const input = document.getElementById('dash-portal-search');
+  const input = document.getElementById('dash-portal-search') || document.getElementById('projects-portal-search') || document.getElementById('tb-portal-search');
   const query = (input && input.value ? input.value : '').trim().toLowerCase();
   if (!query) {
     dashPortalToast('Type a keyword, then press Enter.');

@@ -47,7 +47,7 @@ function enforceReviewerReadOnly() {
 }
 
 window.reviewerNotes = {};
-window.reviewerNotesMinimized = localStorage.getItem('reviewerNotesMinimized') === '1';
+window.reviewerNotesMinimized = localStorage.getItem('reviewerNotesMinimized') !== '0';
 
 function applyReviewerNotesMinimizedState() {
     const box = document.getElementById('reviewer-floating-notes');

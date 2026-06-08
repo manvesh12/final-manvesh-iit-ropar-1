@@ -44,7 +44,7 @@ const JS_FILES = [
   'js/main.js'
 ];
 
-const ASSET_VERSION = 'smooth-load-20260609-sidebar-theme-fix';
+const ASSET_VERSION = 'smooth-load-20260609-global-dashboard-topbar';
 
 function compile() {
   console.log('Compiling DSR Portal...');

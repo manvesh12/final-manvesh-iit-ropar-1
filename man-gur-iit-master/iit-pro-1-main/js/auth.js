@@ -101,12 +101,16 @@ async function doLogin() {
       S.role = uiRole;
       if (typeof currentDistrictFilter !== 'undefined') currentDistrictFilter = 'ALL';
       
-      await showAppScreen();
+  await showAppScreen();
       setTimeout(() => {
+        try {
           const filterDropdown = document.getElementById('dash-district-filter');
           if (filterDropdown) filterDropdown.value = 'ALL';
           if (typeof filterDashboardByDistrict === 'function') filterDashboardByDistrict('ALL');
           if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
+        } catch (uiError) {
+          console.warn('Post-login UI refresh skipped:', uiError);
+        }
       }, 100);
   } catch (error) {
       err.style.display='block'; 
@@ -237,12 +241,15 @@ async function showAppScreen() {
   }
   if (typeof updateDarkModeIcon === 'function') updateDarkModeIcon();
   const init = S.user.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-  document.getElementById('sb-avatar').textContent = init;
-  document.getElementById('sb-uname').textContent = S.user.name;
+  const sidebarAvatar = document.getElementById('sb-avatar');
+  if (sidebarAvatar) sidebarAvatar.textContent = init;
+  const sidebarName = document.getElementById('sb-uname');
+  if (sidebarName) sidebarName.textContent = S.user.name;
   
   const isSdlc = S.role === 'sdlc';
   const roleLabel = (typeof getRoleRule === 'function') ? getRoleRule().label : (S.role==='admin'?'System Admin':S.role==='reviewer'?'Section Reviewer':isSdlc?'SDLC Committee':'Report Coordinator');
-  document.getElementById('sb-urole').textContent = S.accessLabel || roleLabel;
+  const sidebarRole = document.getElementById('sb-urole');
+  if (sidebarRole) sidebarRole.textContent = S.accessLabel || roleLabel;
   
   // Toggle visibility of admin sections in the sidebar
   const navAuditLogs = document.getElementById('nav-audit-logs');

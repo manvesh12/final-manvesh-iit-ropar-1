@@ -279,7 +279,10 @@ function scheduleAnx1LivePreview(delay = 500) {
 }
 
 function exportAnx1PDF(btn, isLivePreview = false) {
-  if (isLivePreview) renderAnx1LivePreviewHtml();
+  if (isLivePreview) {
+    renderAnx1LivePreviewHtml();
+    return;
+  }
 
   if (typeof html2pdf === 'undefined') {
     const originalText = btn ? btn.innerText : 'Loading...';

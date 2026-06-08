@@ -2418,6 +2418,39 @@ body.view-dashboard-active .page-body,
   width: 100% !important;
 }
 
+/* Projects uses the same government header shell as the dashboard. */
+body.view-projects-active .sidebar,
+#screen-app:has(#view-projects.active) .sidebar {
+  display: none !important;
+}
+
+body.view-projects-active .topbar,
+#screen-app:has(#view-projects.active) .topbar {
+  display: none !important;
+}
+
+body.view-projects-active .app-workspace,
+#screen-app:has(#view-projects.active) .app-workspace {
+  margin-left: 0 !important;
+  padding: 0 !important;
+}
+
+body.view-projects-active .main-content,
+#screen-app:has(#view-projects.active) .main-content {
+  margin-left: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+body.view-projects-active .page-body,
+#screen-app:has(#view-projects.active) .page-body {
+  padding: 0 !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
 /* Final global dark theme layer: overrides inline light styles across the portal */
 body:not(.view-dashboard-active) .sidebar {
   background: #f7f4ee !important;
@@ -2830,8 +2863,11 @@ html.dark .layout-pill {
 }
 
 .reviewer-floating-notes.is-minimized {
-  width: min(300px, calc(100vw - 28px));
-  max-height: 54px;
+  width: 58px;
+  height: 58px;
+  max-height: 58px;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 .reviewer-floating-notes.is-minimized .reviewer-notes-body,
@@ -2840,7 +2876,63 @@ html.dark .layout-pill {
 }
 
 .reviewer-floating-notes.is-minimized .reviewer-notes-header {
-  padding: 12px 12px 12px 14px;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.reviewer-floating-notes.is-minimized .reviewer-notes-header > div:first-child {
+  font-size: 0 !important;
+  gap: 0 !important;
+}
+
+.reviewer-floating-notes.is-minimized .reviewer-notes-header > div:first-child i {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+.reviewer-floating-notes.is-minimized .reviewer-notes-header-actions {
+  position: absolute;
+  inset: 0;
+}
+
+.reviewer-floating-notes.is-minimized #reviewer-notes-section-title {
+  display: none !important;
+}
+
+.reviewer-floating-notes.is-minimized .reviewer-notes-icon-btn {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+}
+
+.reviewer-floating-notes.is-minimized .reviewer-notes-icon-btn i {
+  display: none;
+}
+
+.reviewer-floating-notes.is-minimized::after {
+  content: "";
+  position: absolute;
+  right: 7px;
+  top: 7px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+}
+
+.reviewer-floating-notes.is-minimized:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.24);
 }
 
 html.dark .reviewer-floating-notes {
@@ -2862,5 +2954,260 @@ html.dark .reviewer-notes-footer {
   .reviewer-floating-notes {
     right: 12px;
     bottom: 12px;
+  }
+}
+
+/* Dashboard-style global topbar for every non-dashboard/non-project app view */
+body:not(.view-dashboard-active):not(.view-projects-active) {
+  --topbar-h: 238px !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .topbar.dash-global-topbar {
+  top: 0 !important;
+  left: var(--sidebar-w) !important;
+  right: 0 !important;
+  width: calc(100% - var(--sidebar-w)) !important;
+  height: auto !important;
+  min-height: var(--topbar-h) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  color: #17324D !important;
+  box-shadow: 0 6px 20px rgba(23, 50, 77, 0.14) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  overflow: visible !important;
+  z-index: 500 !important;
+}
+
+body.sidebar-hidden:not(.view-dashboard-active):not(.view-projects-active) .topbar.dash-global-topbar {
+  left: 0 !important;
+  width: 100% !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .app-workspace {
+  padding-top: var(--topbar-h) !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-switcher-bar,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-utility-strip,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-brand-row,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-menu-bar,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-notice-ticker {
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-switcher-bar {
+  height: 38px !important;
+  padding: 6px 24px !important;
+  background: #0F1C2A !important;
+  color: #ffffff !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-utility-strip {
+  background: #0B1E33 !important;
+  color: #ffffff !important;
+  padding: 8px 24px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-brand-row {
+  background: #ffffff !important;
+  padding: 16px 24px !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-texts {
+  cursor: pointer;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-title {
+  color: #17324D !important;
+  font-size: 27px !important;
+  line-height: 1.08 !important;
+  margin: 0 !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-bilingual,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-subtitle {
+  color: #64748B !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-menu-bar {
+  background: #17324D !important;
+  color: #ffffff !important;
+  min-height: 48px !important;
+  padding: 0 24px !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-links {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item {
+  position: relative;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item button,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item .tb-sub-nav-btn {
+  min-height: 48px !important;
+  padding: 0 16px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item button:hover,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item.active button,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item .tb-sub-nav-btn.active {
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #C49A58 !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item button i,
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-link-item .tb-sub-nav-btn i {
+  color: currentColor !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-search input {
+  width: 210px !important;
+  height: 34px !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-notice-ticker {
+  min-height: 32px !important;
+  background: #F8FAFC !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar #tb-district-badge {
+  margin-left: auto !important;
+  margin-right: 18px !important;
+  border-radius: 4px !important;
+  background: #E2E8F0 !important;
+  color: #17324D !important;
+  border: 1px solid #CBD5E1 !important;
+  padding: 4px 10px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .tb-dropdown-menu {
+  top: calc(100% + 8px) !important;
+  right: 0 !important;
+  left: auto !important;
+  min-width: 230px !important;
+  z-index: 900 !important;
+  border-radius: 8px !important;
+  background: #ffffff !important;
+  color: #17324D !important;
+  border: 1px solid #E2E8F0 !important;
+  box-shadow: 0 16px 36px rgba(23, 50, 77, 0.16) !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar #tb-projects-dropdown {
+  left: 0 !important;
+  right: auto !important;
+}
+
+body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-btn-new-project {
+  border-color: #C49A58 !important;
+  background: #C49A58 !important;
+  color: #17324D !important;
+}
+
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .topbar.dash-global-topbar,
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-brand-row,
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-notice-ticker {
+  background: #0d1a2b !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-switcher-bar,
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-utility-strip {
+  background: #020817 !important;
+}
+
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-menu-bar {
+  background: #0f2338 !important;
+}
+
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-title {
+  color: #f8fafc !important;
+}
+
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-bilingual,
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-subtitle {
+  color: #a9b8ca !important;
+}
+
+html.dark body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .tb-dropdown-menu {
+  background: #0d1a2b !important;
+  color: #dbe7f5 !important;
+  border-color: rgba(196, 154, 88, 0.30) !important;
+}
+
+@media (max-width: 1180px) {
+  body:not(.view-dashboard-active):not(.view-projects-active) {
+    --topbar-h: 290px !important;
+  }
+
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-brand-row,
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-menu-bar,
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-notice-ticker {
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+  }
+
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-title {
+    font-size: 21px !important;
+  }
+
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-links,
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-search {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 760px) {
+  body:not(.view-dashboard-active):not(.view-projects-active) {
+    --topbar-h: 390px !important;
+  }
+
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-switcher-bar,
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-utility-strip,
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-brand-row,
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-menu-bar,
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-gov-notice-ticker {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-brand-right {
+    width: 100% !important;
+    justify-content: flex-start !important;
+  }
+
+  body:not(.view-dashboard-active):not(.view-projects-active) .dash-global-topbar .dash-menu-search input {
+    width: 100% !important;
   }
 }

@@ -176,6 +176,11 @@ function renderCont() {
   </tr>`;
 }
 
+// Keep legacy inline handlers and callers working.
+function renderContigous() {
+  return renderCont();
+}
+
 function addContRow() {
   contData.push({ river:'', ccNo:'', clusterNo:'', leases:'', location:'Riverbed', distance:'', village:'', area:0, mineral:0 });
   renderContigous();
