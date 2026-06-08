@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 echo ===================================================
 echo     DSR Portal - One Click Start Script
 echo ===================================================
@@ -31,12 +32,11 @@ echo.
 
 echo [1/2] Starting Spring Boot Backend...
 :: This opens a new terminal window for the backend
-start "DSR Backend" cmd /k "cd dsr-backend && run.bat"
+start "DSR Backend" cmd /k "cd /d ""%~dp0dsr-backend"" && run.bat"
 
-echo [2/2] Starting Frontend Watcher and Server...
-start "DSR Frontend (Watcher)" cmd /k "cd iit-pro-1-main && echo Watching Templates for changes... && node build.js --watch"
-timeout /t 3 /nobreak >nul
-start "DSR Frontend (Server)" cmd /k "cd iit-pro-1-main && echo Starting Local Server... && npx http-server -p 5500 -c-1 -o"
+echo [2/2] Building Frontend and Starting Portal Server...
+for /f "tokens=5" %%P in ('netstat -ano ^| findstr ":8081" ^| findstr "LISTENING"') do taskkill /PID %%P /F >nul 2>nul
+start "DSR Portal Server" cmd /k "cd /d ""%~dp0iit-pro-1-main"" && echo Building latest frontend files... && node build.js && echo Starting Local Portal Server on port 8081... && set DSR_NO_WATCH=1 && node server.js"
 
 echo.
 echo Both services have been launched in separate windows!
@@ -44,7 +44,7 @@ echo.
 echo ===================================================
 echo     Service Links
 echo ===================================================
-echo - Frontend:    http://localhost:5500
+echo - Portal:      http://localhost:8081/login.html
 echo - Backend API: http://localhost:8080/api-docs (Swagger)
 echo - pgAdmin:     http://localhost:5055 (admin@dsr.com / admin)
 echo - MinIO Console: http://localhost:9011 (minioadmin / minioadmin)

@@ -47,18 +47,44 @@ function enforceReviewerReadOnly() {
 }
 
 window.reviewerNotes = {};
+window.reviewerNotesMinimized = localStorage.getItem('reviewerNotesMinimized') === '1';
+
+function applyReviewerNotesMinimizedState() {
+    const box = document.getElementById('reviewer-floating-notes');
+    const btn = document.getElementById('reviewer-notes-minimize-btn');
+    if (!box) return;
+
+    box.classList.toggle('is-minimized', !!window.reviewerNotesMinimized);
+    if (btn) {
+        btn.title = window.reviewerNotesMinimized ? 'Expand reviewer notes' : 'Minimize reviewer notes';
+        btn.setAttribute('aria-label', btn.title);
+        btn.innerHTML = window.reviewerNotesMinimized
+            ? '<i data-lucide="maximize-2" style="width:14px; height:14px;"></i>'
+            : '<i data-lucide="minus" style="width:14px; height:14px;"></i>';
+    }
+    if (window.initLucide) initLucide();
+}
+
+function toggleReviewerNotesMinimized() {
+    window.reviewerNotesMinimized = !window.reviewerNotesMinimized;
+    localStorage.setItem('reviewerNotesMinimized', window.reviewerNotesMinimized ? '1' : '0');
+    applyReviewerNotesMinimizedState();
+}
+window.toggleReviewerNotesMinimized = toggleReviewerNotesMinimized;
 
 function loadReviewerNoteForView(viewId, viewTitle) {
+    const notesBox = document.getElementById('reviewer-floating-notes');
     if (typeof S === 'undefined' || !hasReviewAccess() || !S.activeProject) {
-        document.getElementById('reviewer-floating-notes').style.display = 'none';
+        if (notesBox) notesBox.style.display = 'none';
         return;
     }
     // Only show for content views
     if (['dashboard', 'workflow', 'users', 'history'].includes(viewId)) {
-        document.getElementById('reviewer-floating-notes').style.display = 'none';
+        if (notesBox) notesBox.style.display = 'none';
         return;
     }
-    document.getElementById('reviewer-floating-notes').style.display = 'flex';
+    if (notesBox) notesBox.style.display = 'flex';
+    applyReviewerNotesMinimizedState();
     document.getElementById('reviewer-notes-section-title').textContent = viewTitle || viewId;
     document.getElementById('reviewer-section-note').value = window.reviewerNotes[viewId] || '';
     document.getElementById('reviewer-section-note').dataset.viewId = viewId;

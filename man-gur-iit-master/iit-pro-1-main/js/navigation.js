@@ -223,6 +223,11 @@ function normalizeAnnexureViewLayout(id) {
 }
 
 function refreshCoreAnnexurePreview(id) {
+  if (window.pdfPreview && typeof window.pdfPreview.generateAnnexureLivePreview === 'function') {
+    window.pdfPreview.generateAnnexureLivePreview(id, 80);
+    return;
+  }
+
   const fn = {
     anx1: window.exportAnx1PDF,
     anx2: window.exportAnx2PDF,
@@ -232,8 +237,16 @@ function refreshCoreAnnexurePreview(id) {
     anx6: window.exportAnx6PDF,
     anx7: window.exportAnx7PDF
   }[id];
-  if (typeof fn === 'function') {
-    setTimeout(() => fn(null, true), 80);
+  if (typeof fn !== 'function') return;
+
+  const run = () => fn(null, true);
+  if (typeof ensurePortalVendors === 'function') {
+    ensurePortalVendors(['jspdf', 'autotable']).then(run).catch(err => {
+      console.error('Live preview tools failed:', err);
+      if (typeof toast === 'function') toast('Live preview tools could not load.', 'error');
+    });
+  } else {
+    setTimeout(run, 80);
   }
 }
 

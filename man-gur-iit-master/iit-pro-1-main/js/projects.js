@@ -445,7 +445,9 @@ async function openProject(id) {
     updateSidebarToggleVisibility();
   }
 
-  const firstAllowedView = typeof getFirstAllowedView === 'function' ? getFirstAllowedView() : 'projects';
+  const firstAllowedView = typeof getFirstAllowedProjectView === 'function'
+    ? getFirstAllowedProjectView()
+    : (typeof getFirstAllowedView === 'function' ? getFirstAllowedView() : 'projects');
   showView(firstAllowedView, null);
   toast('Opened: '+dist+' DSR Project','info');
 }

@@ -130,6 +130,7 @@ function processExcelData(rows, sectionType) {
     uploadRows.forEach(row => addRowAnx1(tableId, row));
   }
   toast(`Uploaded section ${sectionType} data successfully`, 'success');
+  scheduleAnx1LivePreview(200);
 }
 
 function addRowAnx1(tableId, cellDataArray) {
@@ -162,10 +163,124 @@ function addRowAnx1(tableId, cellDataArray) {
   
   tbody.appendChild(tr);
   if (window.initLucide) window.initLucide();
+  scheduleAnx1LivePreview(250);
 }
 
 // --- 3. FLAWLESS PAGINATED PDF GENERATOR ---
+function escapeAnx1Html(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getAnx1TableRows(tableId) {
+  return Array.from(document.querySelectorAll(`#${tableId} tbody tr`)).map(row => (
+    Array.from(row.querySelectorAll('td')).slice(0, -1).map(cell => {
+      const select = cell.querySelector('select');
+      return select ? select.value : cell.innerText.trim();
+    })
+  ));
+}
+
+function buildAnx1PreviewMarkup() {
+  const sections = [
+    {
+      id: 'anx1-rivers',
+      title: 'a) Rivers:',
+      headers: ['River Name/M-Sand Plant', 'Total Stretch of River (in KM)', 'Type of River (Perennial or Non Perennial)']
+    },
+    {
+      id: 'anx1-desilt',
+      title: 'b) De-Siltation Location (Lakes/Ponds/Dams etc.):',
+      headers: ['Name of Reservoir/Dams', 'Maintain/Controlled by State Govt./PSU etc.', 'Latitude', 'Longitude', 'District', 'Tehsil', 'Village', 'Size (Ha)']
+    },
+    {
+      id: 'anx1-patta',
+      title: 'c) Patta lands/Khatedari land:',
+      headers: ['Owner', 'SL. No', 'Area (Ha)', 'District', 'Tehsil', 'Village', 'Agricultural Land (Yes/No)']
+    },
+    {
+      id: 'anx1-msand',
+      title: 'd) M-Sand Plants:',
+      headers: ['Plant Name', 'Owner', 'District', 'Tehsil', 'Village', 'Geo-location', 'Quantity Tonnes/Annum']
+    }
+  ];
+
+  const sectionHtml = sections.map(section => {
+    const rows = getAnx1TableRows(section.id);
+    const body = rows.length
+      ? rows.map(row => `<tr>${section.headers.map((_, i) => `<td>${escapeAnx1Html(row[i] || 'NUL')}</td>`).join('')}</tr>`).join('')
+      : `<tr><td colspan="${section.headers.length}" class="empty">Data not provided</td></tr>`;
+
+    return `
+      <section class="anx1-section">
+        <h2>${escapeAnx1Html(section.title)}</h2>
+        <table>
+          <thead><tr>${section.headers.map(h => `<th>${escapeAnx1Html(h)}</th>`).join('')}</tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </section>`;
+  }).join('');
+
+  return `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; background: #eef2f7; color: #111827; font-family: Arial, Helvetica, sans-serif; }
+      .page { width: min(100%, 980px); min-height: 100vh; margin: 0 auto; padding: 28px 30px 40px; background: #fff; box-shadow: 0 12px 32px rgba(15,23,42,.12); }
+      h1 { margin: 0 0 4px; text-align: center; font-size: 22px; text-decoration: underline; }
+      .sub { margin: 0 0 26px; text-align: center; font-size: 15px; }
+      .anx1-section { margin: 0 0 24px; page-break-inside: avoid; }
+      h2 { margin: 0 0 10px; font-size: 14px; }
+      table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 11px; }
+      th, td { border: 1px solid #111827; padding: 6px 7px; vertical-align: top; word-break: break-word; overflow-wrap: anywhere; }
+      th { background: #f3f4f6; font-weight: 700; text-align: left; }
+      .empty { text-align: center; color: #6b7280; }
+      @media (max-width: 720px) {
+        .page { padding: 18px 14px 28px; box-shadow: none; }
+        h1 { font-size: 18px; }
+        .sub { font-size: 13px; }
+        table { min-width: 680px; font-size: 10px; }
+        .anx1-section { overflow-x: auto; padding-bottom: 8px; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <h1>Annexure-I</h1>
+      <p class="sub">Details of Sand/M-Sand Sources</p>
+      ${sectionHtml}
+    </main>
+  </body>
+</html>`;
+}
+
+function renderAnx1LivePreviewHtml() {
+  const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx1') : document.getElementById('pdf-preview-iframe'));
+  if (!iframe) return null;
+  iframe.style.display = 'block';
+  iframe.removeAttribute('src');
+  iframe.srcdoc = buildAnx1PreviewMarkup();
+  return iframe;
+}
+
+function scheduleAnx1LivePreview(delay = 500) {
+  if (window.anx1DebounceTimer) clearTimeout(window.anx1DebounceTimer);
+  window.anx1DebounceTimer = setTimeout(() => {
+    if (window.pdfPreview && window.pdfPreview.currentView === 'anx1') {
+      exportAnx1PDF(null, true);
+    }
+  }, delay);
+}
+
 function exportAnx1PDF(btn, isLivePreview = false) {
+  if (isLivePreview) renderAnx1LivePreviewHtml();
+
   if (typeof html2pdf === 'undefined') {
     const originalText = btn ? btn.innerText : 'Loading...';
     if (btn) btn.innerText = "Loading PDF Engine...";
@@ -200,58 +315,7 @@ function executePDFExport(isLivePreview) {
   printElement.style.color = '#000000';
   printElement.style.backgroundColor = '#ffffff';
 
-  let html = `
-    <div style="text-align: center; margin-bottom: 20px; padding-top: 10px;">
-      <h2 style="margin: 0 0 5px 0; font-size: 22px; font-weight: bold; text-decoration: underline;">Annexure-I</h2>
-      <h3 style="margin: 0; font-size: 16px; font-weight: normal;">Details of Sand/M-Sand Sources</h3>
-    </div>
-  `;
-
-  const addTable = (tableId, sectionTitle, headers) => {
-    let tableHtml = `<div style="margin-bottom: 25px; page-break-inside: avoid;">
-      <h4 style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold;">${sectionTitle}</h4>
-      <table style="width: 100%; border-collapse: collapse; font-size: 12px; border: 1px solid #000;">
-        <thead>
-          <tr style="page-break-inside: avoid;">`;
-    
-    headers.forEach(h => {
-      tableHtml += `<th style="border: 1px solid #000; padding: 6px; text-align: left; font-weight: bold; background-color: #f5f5f5;">${h}</th>`;
-    });
-    
-    tableHtml += `</tr></thead><tbody>`;
-    
-    const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-    if(rows.length === 0) {
-       tableHtml += `<tr style="page-break-inside: avoid;"><td colspan="${headers.length}" style="border: 1px solid #000; padding: 6px; text-align: center;">Data not provided</td></tr>`;
-    } else {
-      rows.forEach(row => {
-        tableHtml += `<tr style="page-break-inside: avoid;">`;
-        const cells = row.querySelectorAll('td');
-        
-        for(let i = 0; i < cells.length - 1; i++) {
-           let val = "";
-           const select = cells[i].querySelector('select');
-           if (select) {
-              val = select.value;
-           } else {
-              val = cells[i].innerText.trim();
-           }
-           tableHtml += `<td style="border: 1px solid #000; padding: 6px;">${val}</td>`;
-        }
-        tableHtml += `</tr>`;
-      });
-    }
-    
-    tableHtml += `</tbody></table></div>`;
-    return tableHtml;
-  };
-
-  html += addTable('anx1-rivers', 'a) Rivers:', ['River Name/M-Sand Plant', 'Total Stretch of River (in KM)', 'Type of River (Perennial or Non Perennial)']);
-  html += addTable('anx1-desilt', 'b) De-Siltation Location (Lakes/Ponds/Dams etc.):', ['Name of Reservoir/Dams', 'Maintain/Controlled by State Govt./PSU etc.', 'Latitude', 'Longitude', 'District', 'Tehsil', 'Village', 'Size (Ha)']);
-  html += addTable('anx1-patta', 'c) Patta lands/Khatedari land:', ['Owner', 'SL. No', 'Area (Ha)', 'District', 'Tehsil', 'Village', 'Agricultural Land (Yes/No)']);
-  html += addTable('anx1-msand', 'd) M-Sand Plants:', ['Plant Name', 'Owner', 'District', 'Tehsil', 'Village', 'Geo-location', 'Quantity Tonnes/Annum']);
-  
-  printElement.innerHTML = html;
+  printElement.innerHTML = buildAnx1PreviewMarkup();
   
   // We attach it invisibly so html2pdf can process it
   printElement.style.position = 'absolute';
@@ -284,8 +348,10 @@ function executePDFExport(isLivePreview) {
       const blobUrl = URL.createObjectURL(blob);
       
       document.body.removeChild(printElement);
-      const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx1') : document.getElementById('pdf-iframe'));
-      if (iframe) iframe.src = blobUrl;
+      const iframe = window.setAnnexurePreviewIframeSrc
+        ? window.setAnnexurePreviewIframeSrc('anx1', blobUrl)
+        : (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx1') : document.getElementById('pdf-preview-iframe'));
+      if (iframe) iframe.removeAttribute('srcdoc');
     }).catch(err => {
       if(document.body.contains(printElement)) document.body.removeChild(printElement);
       console.error(err);
@@ -323,10 +389,7 @@ function executePDFExport(isLivePreview) {
 // Auto Live Preview whenever the table changes
 document.addEventListener('input', (e) => {
   if (e.target.closest('#anx1-rivers, #anx1-desilt, #anx1-patta, #anx1-msand')) {
-    if (window.anx1DebounceTimer) clearTimeout(window.anx1DebounceTimer);
-    window.anx1DebounceTimer = setTimeout(() => {
-       exportAnx1PDF(null, true);
-    }, 1500); // 1.5 seconds after typing stops
+    scheduleAnx1LivePreview(700);
   }
 });
 
@@ -393,6 +456,7 @@ function renderPdfUploadUIAnx1() {
 window.renderPdfUploadUIAnx1 = renderPdfUploadUIAnx1;
 
 function togglePDFPreviewAnx1() {
+  if (window.pdfPreview) window.pdfPreview.show('anx1');
   exportAnx1PDF(null, true);
 }
 
@@ -406,6 +470,7 @@ async function deletePdfAnx1() {
   // Hide preview and clear iframe first to release Windows file lock
   const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx1') : document.getElementById('pdf-iframe'));
   if (iframe) {
+    iframe.removeAttribute('srcdoc');
     if (iframe.src.startsWith('blob:')) {
       URL.revokeObjectURL(iframe.src);
     }
@@ -468,6 +533,7 @@ function handlePDFUpload(event) {
   
   const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx1') : document.getElementById('pdf-iframe'));
   if (iframe) {
+    iframe.removeAttribute('srcdoc');
     iframe.src = fileURL;
   }
   
@@ -479,6 +545,7 @@ function handlePDFUpload(event) {
 function closePDFPreview() {
   const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx1') : document.getElementById('pdf-iframe'));
   if (iframe) {
+    iframe.removeAttribute('srcdoc');
     if (iframe.src.startsWith('blob:')) {
       URL.revokeObjectURL(iframe.src);
     }
@@ -507,19 +574,13 @@ function downloadPdfAnx1() {
 // Auto Live Preview whenever the table changes
 document.addEventListener('input', (e) => {
   if (e.target.closest('#view-anx1 table')) {
-    if (window.anx1DebounceTimer) clearTimeout(window.anx1DebounceTimer);
-    window.anx1DebounceTimer = setTimeout(() => {
-       exportAnx1PDF(null, true);
-    }, 1500); // 1.5 seconds after typing stops
+    scheduleAnx1LivePreview(700);
   }
 });
 
 
 document.addEventListener('change', (e) => {
   if (e.target.closest('#view-anx1 table')) {
-    if (window.anx1DebounceTimer) clearTimeout(window.anx1DebounceTimer);
-    window.anx1DebounceTimer = setTimeout(() => {
-      exportAnx1PDF(null, true);
-    }, 300);
+    scheduleAnx1LivePreview(300);
   }
 });

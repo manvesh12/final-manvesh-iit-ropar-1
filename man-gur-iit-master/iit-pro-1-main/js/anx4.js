@@ -673,7 +673,7 @@ function exportAnx4PDF(btn, isLivePreview = false) {
   if (isLivePreview) {
     const blob = doc.output('blob');
     const blobUrl = URL.createObjectURL(blob);
-    const iframe = document.getElementById('pdf-iframe-anx4');
+    const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx4') : document.getElementById('pdf-iframe-anx4'));
     if (iframe) iframe.src = blobUrl;
   } else {
     doc.save("Annexure_IV_Transportation_Routes.pdf");
@@ -696,7 +696,7 @@ function renderPdfUploadUIAnx4() {
   const delBtn = document.getElementById('anx4-delete-btn');
   const previewBtn = document.getElementById('anx4-preview-btn');
   const previewSection = document.getElementById('pdf-preview-section-anx4');
-  const iframe = document.getElementById('pdf-iframe-anx4');
+  const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx4') : document.getElementById('pdf-iframe-anx4'));
 
   if (!nameEl || !dlBtn) return;
 
@@ -742,7 +742,7 @@ window.renderPdfUploadUIAnx4 = renderPdfUploadUIAnx4;
 
 function togglePDFPreviewAnx4() {
   const previewSection = document.getElementById('pdf-preview-section-anx4');
-  const iframe = document.getElementById('pdf-iframe-anx4');
+  const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx4') : document.getElementById('pdf-iframe-anx4'));
   if (!previewSection || !iframe) return;
 
   if (previewSection.style.display === 'block') {
@@ -797,7 +797,7 @@ function handlePDFUploadAnx4(event) {
     S.projects[pIdx].pdfData.anx4 = fileURL;
   }
 
-  const iframe = document.getElementById('pdf-iframe-anx4');
+  const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx4') : document.getElementById('pdf-iframe-anx4'));
   const previewSection = document.getElementById('pdf-preview-section-anx4');
   if (iframe && previewSection) {
     iframe.src = fileURL;
@@ -818,7 +818,7 @@ async function deletePdfAnx4() {
 
   // Hide preview and clear iframe first to release Windows file lock
   const previewSection = document.getElementById('pdf-preview-section-anx4');
-  const iframe = document.getElementById('pdf-iframe-anx4');
+  const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx4') : document.getElementById('pdf-iframe-anx4'));
   if (previewSection) previewSection.style.display = 'none';
   if (iframe) {
     if (iframe.src.startsWith('blob:')) {
@@ -849,7 +849,7 @@ async function deletePdfAnx4() {
 
 closePDFPreviewAnx4 = function () {
   const previewSection = document.getElementById('pdf-preview-section-anx4');
-  const iframe = document.getElementById('pdf-iframe-anx4');
+  const iframe = (window.getAnnexurePreviewIframe ? window.getAnnexurePreviewIframe('anx4') : document.getElementById('pdf-iframe-anx4'));
 
   if (previewSection) previewSection.style.display = 'none';
   if (iframe) {

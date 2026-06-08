@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <meta name="color-scheme" content="light" />
+  <meta name="color-scheme" content="light dark" />
   <title>DSR Portal — IIT Ropar | District Survey Report Automation System</title>
   <script src="js/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
     href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/premium-theme.css?v=2.1">
+  <link rel="stylesheet" href="css/premium-theme.css?v=2.4-sidebar-theme">
   <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js"></script>
 </head>
 <body class="sidebar-hidden premium-body">
@@ -507,7 +507,7 @@
     <div class="main-content">
       <div class="page-body">
       <!-- ═══ DASHBOARD ═══ -->
-<div id="view-dashboard" class="view active" style="position: relative; z-index: 1; padding: 0 !important; margin: 0 !important; background: #ffffff;">
+<div id="view-dashboard" class="view active" style="position: relative; z-index: 1; padding: 0 !important; margin: 0 !important; background: var(--dash-page-bg, #ffffff);">
 
   <style>
     /* Scoped Dashboard styles mimicking the mockup exactly */
@@ -1579,10 +1579,12 @@
     }
 
     #dash-right-sidebar .whats-new-sidebar {
-      background: #17324D;
+      background: linear-gradient(180deg, #17324D 0%, #0f243a 100%);
       color: #ffffff;
       border-radius: 8px;
       padding: 18px;
+      border: 1px solid rgba(196, 154, 88, 0.28);
+      box-shadow: 0 12px 24px rgba(23, 50, 77, 0.14);
     }
 
     #dash-right-sidebar .whats-new-title {
@@ -1592,6 +1594,7 @@
       font-size: 15px;
       font-weight: 800;
       margin-bottom: 8px;
+      color: #ffffff;
     }
 
     #dash-right-sidebar .whats-new-desc {
@@ -1610,12 +1613,14 @@
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
-      color: rgba(255, 255, 255, 0.84);
+      color: #dbeafe;
+      border: 1px solid transparent;
     }
 
     #dash-right-sidebar .whats-new-item:hover,
     #dash-right-sidebar .whats-new-item.active-filter {
       background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(196, 154, 88, 0.35);
       color: #ffffff;
     }
 
@@ -1628,6 +1633,7 @@
       justify-content: center;
       font-size: 10px;
       font-weight: 900;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
     }
 
     #dash-right-sidebar .whats-new-name {
@@ -1637,6 +1643,275 @@
       white-space: nowrap;
       font-size: 13px;
       font-weight: 700;
+      color: inherit;
+    }
+
+    #dash-right-sidebar .whats-new-arrow {
+      color: rgba(255, 255, 255, 0.62);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #dash-right-sidebar .whats-new-item:hover .whats-new-arrow,
+    #dash-right-sidebar .whats-new-item.active-filter .whats-new-arrow {
+      color: #C49A58;
+    }
+
+    /* Dashboard dark mode: scoped to this page so other portal screens keep their own theme */
+    html.dark #view-dashboard {
+      --dash-page-bg: #07111f;
+    }
+
+    html.dark #view-dashboard,
+    html.dark #view-dashboard .dash-portal-wrapper {
+      background: #07111f;
+      color: #e5edf6;
+    }
+
+    html.dark #view-dashboard .dash-switcher-bar,
+    html.dark #view-dashboard .dash-gov-utility-strip {
+      background: #020817;
+      color: #e5edf6;
+      border-color: rgba(148, 163, 184, 0.18);
+    }
+
+    html.dark #view-dashboard .dash-switcher-tab.inactive {
+      background: #142237;
+      color: #dbeafe;
+    }
+
+    html.dark #view-dashboard .dash-switcher-info,
+    html.dark #view-dashboard .dash-gov-right button,
+    html.dark #view-dashboard .dash-gov-right a {
+      color: #b6c4d6;
+    }
+
+    html.dark #view-dashboard .dash-gov-right button:hover,
+    html.dark #view-dashboard .dash-gov-right a:hover {
+      color: #ffffff;
+    }
+
+    html.dark #view-dashboard .dash-font-btn {
+      color: #e5edf6;
+      border-color: rgba(226, 232, 240, 0.22);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    html.dark #view-dashboard .dash-gov-brand-row,
+    html.dark #view-dashboard .dash-gov-info-bar,
+    html.dark #view-dashboard .dash-section-key-features,
+    html.dark #view-dashboard .dash-live-workbench,
+    html.dark #view-dashboard .dash-bottom-layout-grid {
+      background: #07111f;
+    }
+
+    html.dark #view-dashboard .dash-gov-brand-row,
+    html.dark #view-dashboard .dash-gov-info-bar {
+      border-color: rgba(148, 163, 184, 0.16);
+    }
+
+    html.dark #view-dashboard .dash-brand-title,
+    html.dark #view-dashboard .dash-section-title,
+    html.dark #view-dashboard .dash-info-bar-left strong,
+    html.dark #view-dashboard .dash-panel-title,
+    html.dark #view-dashboard .dash-panel-link-all,
+    html.dark #view-dashboard .dash-feature-title,
+    html.dark #view-dashboard .dash-quick-title,
+    html.dark #view-dashboard .dist-progress-name,
+    html.dark #view-dashboard #dash-recent .file-name {
+      color: #f8fafc;
+    }
+
+    html.dark #view-dashboard .dash-brand-subtitle,
+    html.dark #view-dashboard .dash-info-bar-container,
+    html.dark #view-dashboard .dash-feature-desc,
+    html.dark #view-dashboard .dash-update-meta,
+    html.dark #view-dashboard .dash-quick-subtitle,
+    html.dark #view-dashboard .dist-progress-pct {
+      color: #a9b8ca;
+    }
+
+    html.dark #view-dashboard .dash-gov-menu-bar {
+      background: #0f2338;
+      border-bottom-color: #d0a35d;
+    }
+
+    html.dark #view-dashboard .dash-menu-link-item button {
+      color: #dbe7f5;
+    }
+
+    html.dark #view-dashboard .dash-menu-link-item.active button,
+    html.dark #view-dashboard .dash-menu-link-item button:hover {
+      background: rgba(255, 255, 255, 0.10);
+      color: #ffffff;
+    }
+
+    html.dark #view-dashboard .dash-menu-search input {
+      background: rgba(15, 23, 42, 0.7);
+      border-color: rgba(226, 232, 240, 0.20);
+      color: #ffffff;
+    }
+
+    html.dark #view-dashboard .dash-gov-notice-ticker {
+      background: #21190b;
+      border-bottom-color: rgba(208, 163, 93, 0.28);
+    }
+
+    html.dark #view-dashboard .dash-notice-marquee-text {
+      color: #f6d79e;
+    }
+
+    html.dark #view-dashboard .dash-gov-hero-section {
+      background: linear-gradient(135deg, #0b1726 0%, #112840 100%);
+      border-bottom-color: #d0a35d;
+    }
+
+    html.dark #view-dashboard .dash-hero-desc,
+    html.dark #view-dashboard .dash-stat-lbl {
+      color: #b6c4d6;
+    }
+
+    html.dark #view-dashboard .dash-hero-stat-card {
+      background: rgba(255, 255, 255, 0.055);
+      border-color: rgba(226, 232, 240, 0.14);
+    }
+
+    html.dark #view-dashboard .dash-feature-card,
+    html.dark #view-dashboard .dash-panel-card,
+    html.dark #view-dashboard .dash-quick-access-btn,
+    html.dark #view-dashboard #dash-recent .file-item {
+      background: #0d1a2b;
+      border-color: rgba(148, 163, 184, 0.22);
+      box-shadow: none;
+    }
+
+    html.dark #view-dashboard .dash-feature-card:hover,
+    html.dark #view-dashboard .dash-quick-access-btn:hover {
+      background: #122238;
+      border-color: #d0a35d;
+      box-shadow: 0 12px 26px rgba(0, 0, 0, 0.28);
+    }
+
+    html.dark #view-dashboard .dash-feature-icon-wrapper,
+    html.dark #view-dashboard .dash-quick-icon-box {
+      background: #07111f;
+      border-color: rgba(148, 163, 184, 0.22);
+      color: #d0a35d;
+    }
+
+    html.dark #view-dashboard .dash-feature-card:hover .dash-feature-icon-wrapper {
+      background: #d0a35d;
+      color: #07111f;
+    }
+
+    html.dark #view-dashboard .dash-panel-header {
+      border-bottom-color: rgba(148, 163, 184, 0.18);
+    }
+
+    html.dark #view-dashboard .dash-update-text {
+      color: #e5edf6;
+    }
+
+    html.dark #view-dashboard .dist-progress-bar {
+      background: #1e314b;
+    }
+
+    html.dark #view-dashboard .dash-badge-emgsm,
+    html.dark #view-dashboard .dash-badge-new {
+      background: rgba(16, 185, 129, 0.14);
+      color: #7dd3aa;
+      border-color: rgba(16, 185, 129, 0.28);
+    }
+
+    html.dark #view-dashboard .dash-badge-nic {
+      background: rgba(59, 130, 246, 0.14);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.28);
+    }
+
+    html.dark #view-dashboard .dash-action-icon-btn,
+    html.dark #view-dashboard .dash-btn-logout {
+      background: #0d1a2b;
+      color: #cbd5e1;
+      border-color: rgba(148, 163, 184, 0.22);
+    }
+
+    html.dark #view-dashboard .dash-action-icon-btn:hover {
+      background: #142237;
+      color: #ffffff;
+      border-color: #d0a35d;
+    }
+
+    html.dark #view-dashboard .dash-btn-logout:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: #ef4444;
+      color: #fca5a5;
+    }
+
+    html.dark #view-dashboard .dash-gov-footer {
+      background: #020817;
+      color: #9fb0c5;
+      border-top-color: #d0a35d;
+    }
+
+    html.dark #view-dashboard .dash-footer-title,
+    html.dark #view-dashboard .dash-footer-badge {
+      color: #f8fafc;
+    }
+
+    html.dark #view-dashboard .dash-footer-container {
+      border-bottom-color: rgba(148, 163, 184, 0.16);
+    }
+
+    html.dark #view-dashboard #dash-review-banner {
+      background: #241707 !important;
+      border-color: #b7791f !important;
+    }
+
+    html.dark #view-dashboard #dash-review-banner strong,
+    html.dark #view-dashboard #dash-review-banner-text {
+      color: #f6d79e !important;
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-sidebar {
+      background: linear-gradient(180deg, #0d1a2b 0%, #08111f 100%);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-title {
+      color: #f8fafc;
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-desc {
+      color: #b6c4d6;
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-item {
+      color: #dbeafe;
+      border-color: transparent;
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-item:hover,
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-item.active-filter {
+      background: rgba(208, 163, 93, 0.14);
+      border-color: rgba(208, 163, 93, 0.42);
+      color: #ffffff;
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-badge {
+      color: #07111f !important;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-arrow {
+      color: #8ea4bd;
+    }
+
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-item:hover .whats-new-arrow,
+    html.dark #view-dashboard #dash-right-sidebar .whats-new-item.active-filter .whats-new-arrow {
+      color: #d0a35d;
     }
 
     @media (max-width: 1100px) {
@@ -5911,18 +6186,23 @@
   </div>
 
   <!-- Reviewer Floating Notes Box -->
-  <div id="reviewer-floating-notes" style="display:none; position:fixed; bottom:20px; right:20px; width:340px; background:var(--card); border:1px solid var(--border); box-shadow:0 8px 30px rgba(0,0,0,0.12); border-radius:12px; z-index:9999; flex-direction:column; overflow:hidden;">
-    <div style="background:var(--primary); color:white; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
-      <div style="font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px;">
+  <div id="reviewer-floating-notes" class="reviewer-floating-notes" style="display:none;">
+    <div class="reviewer-notes-header">
+      <div style="font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px; min-width:0;">
         <i data-lucide="edit-3" style="width:16px; height:16px;"></i> Reviewer Notes
       </div>
-      <div style="font-size:11px; opacity:0.8; font-weight:600; text-transform:uppercase;" id="reviewer-notes-section-title">FRONT MATTER</div>
+      <div class="reviewer-notes-header-actions">
+        <div style="font-size:11px; opacity:0.85; font-weight:600; text-transform:uppercase; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="reviewer-notes-section-title">FRONT MATTER</div>
+        <button type="button" class="reviewer-notes-icon-btn" id="reviewer-notes-minimize-btn" onclick="toggleReviewerNotesMinimized()" title="Minimize reviewer notes" aria-label="Minimize reviewer notes">
+          <i data-lucide="minus" style="width:14px; height:14px;"></i>
+        </button>
+      </div>
     </div>
-    <div style="padding:16px;">
+    <div id="reviewer-notes-body" class="reviewer-notes-body">
       <label style="display:block; font-size:12px; font-weight:600; color:var(--text-mid); margin-bottom:8px;">Notes for this section:</label>
       <textarea id="reviewer-section-note" oninput="saveReviewerNote()" style="width:100%; box-sizing:border-box; height:100px; padding:10px; border:1px solid var(--border-2); border-radius:8px; font-size:13px; font-family:inherit; resize:none;" placeholder="Write any required changes or feedback here..."></textarea>
     </div>
-    <div style="padding:12px 16px; border-top:1px solid var(--border); background:var(--bg); display:flex; justify-content:space-between; align-items:center;">
+    <div id="reviewer-notes-footer" class="reviewer-notes-footer">
       <span style="font-size:11px; color:var(--text-soft);">Auto-saved locally</span>
       <button class="btn btn-saffron btn-sm" onclick="openReviewModal()">Review & Return →</button>
     </div>
@@ -5954,41 +6234,42 @@
   <div class="toast" id="toast"></div>
 
   
-<script defer src="js/api.js?v=smooth-load-20260609"></script>
-<script defer src="js/state.js?v=smooth-load-20260609"></script>
-<script defer src="js/hierarchy.js?v=smooth-load-20260609"></script>
-<script defer src="js/performance.js?v=smooth-load-20260609"></script>
-<script defer src="js/navigation.js?v=smooth-load-20260609"></script>
-<script defer src="js/auth.js?v=smooth-load-20260609"></script>
-<script defer src="js/projects.js?v=smooth-load-20260609"></script>
-<script defer src="js/frontmatter.js?v=smooth-load-20260609"></script>
-<script defer src="js/chapters.js?v=smooth-load-20260609"></script>
-<script defer src="js/plates.js?v=smooth-load-20260609"></script>
-<script defer src="js/graphs.js?v=smooth-load-20260609"></script>
-<script defer src="js/users.js?v=smooth-load-20260609"></script>
-<script defer src="js/tables.js?v=smooth-load-20260609"></script>
-<script defer src="js/anx1.js?v=smooth-load-20260609"></script>
-<script defer src="js/anx2.js?v=smooth-load-20260609"></script>
-<script defer src="js/anx3.js?v=smooth-load-20260609"></script>
-<script defer src="js/anx4.js?v=smooth-load-20260609"></script>
-<script defer src="js/anx5.js?v=smooth-load-20260609"></script>
-<script defer src="js/anx6.js?v=smooth-load-20260609"></script>
-<script defer src="js/anx7.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-b.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-c.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-d.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-e.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-f.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-g.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-h.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-i.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-j.js?v=smooth-load-20260609"></script>
-<script defer src="js/annexure-k.js?v=smooth-load-20260609"></script>
-<script defer src="js/signatures.js?v=smooth-load-20260609"></script>
-<script defer src="js/pdf.js?v=smooth-load-20260609"></script>
-<script defer src="js/pdf-preview.js?v=smooth-load-20260609"></script>
-<script defer src="js/audit-logs.js?v=smooth-load-20260609"></script>
-<script defer src="js/sdlc.js?v=smooth-load-20260609"></script>
-<script defer src="js/main.js?v=smooth-load-20260609"></script>
+
+<script defer src="js/api.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/state.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/hierarchy.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/performance.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/navigation.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/auth.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/projects.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/frontmatter.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/chapters.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/plates.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/graphs.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/users.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/tables.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/anx1.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/anx2.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/anx3.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/anx4.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/anx5.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/anx6.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/anx7.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-b.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-c.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-d.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-e.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-f.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-g.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-h.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-i.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-j.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/annexure-k.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/signatures.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/pdf.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/pdf-preview.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/audit-logs.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/sdlc.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
+<script defer src="js/main.js?v=smooth-load-20260609-sidebar-theme-fix"></script>
 </body>
 </html>

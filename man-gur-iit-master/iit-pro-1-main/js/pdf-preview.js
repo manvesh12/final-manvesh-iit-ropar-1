@@ -16,6 +16,8 @@ const pdfPreview = {
   totalPages: 0,
   _scrollRaf: null,
   _textRefreshTimer: null,
+  _annexureRefreshTimers: {},
+  _objectUrls: {},
 
   SECTION_TITLES: {
     'front-matter': 'PDF Preview',
@@ -164,25 +166,7 @@ const pdfPreview = {
           iframe.src = savedPdf;
         } else {
           iframe.src = 'about:blank';
-          // Auto-trigger live preview generation
-          const getExportFnName = (vid) => {
-            if (vid === 'annexure-f') return 'exportAnnexureFPDF';
-            if (vid === 'annexure-k') return 'exportAnnexureKPDF';
-            return 'export' + vid.charAt(0).toUpperCase() + vid.slice(1) + 'PDF';
-          };
-          const exportFnName = getExportFnName(viewId);
-          if (typeof window[exportFnName] === 'function') {
-            const generateLivePreview = () => {
-              const runExport = () => window[exportFnName](null, true);
-              if (typeof ensurePortalVendors === 'function') {
-                ensurePortalVendors(['jspdf', 'autotable']).then(runExport).catch(() => {});
-              } else {
-                runExport();
-              }
-            };
-            if (typeof runWhenIdle === 'function') runWhenIdle(generateLivePreview, 1200);
-            else setTimeout(generateLivePreview, 700);
-          }
+          this.generateAnnexureLivePreview(viewId, 700);
         }
       }
     } else {
@@ -271,18 +255,7 @@ const pdfPreview = {
             iframe.src = savedPdf;
           } else if (!savedPdf) {
             iframe.src = 'about:blank';
-            // Auto-trigger live preview generation
-            const getExportFnName = (vid) => {
-              if (vid === 'annexure-f') return 'exportAnnexureFPDF';
-              if (vid === 'annexure-k') return 'exportAnnexureKPDF';
-              return 'export' + vid.charAt(0).toUpperCase() + vid.slice(1) + 'PDF';
-            };
-            const exportFnName = getExportFnName(viewId);
-            if (typeof window[exportFnName] === 'function') {
-              setTimeout(() => {
-                window[exportFnName](null, true);
-              }, 300);
-            }
+            this.generateAnnexureLivePreview(viewId, 300);
           }
         }
       }
@@ -303,6 +276,39 @@ const pdfPreview = {
       }
     }
     if (window.initLucide) initLucide();
+  },
+
+  getAnnexureExportFnName(viewId) {
+    if (viewId === 'annexure-f') return 'exportAnnexureFPDF';
+    if (viewId === 'annexure-k') return 'exportAnnexureKPDF';
+    return 'export' + viewId.charAt(0).toUpperCase() + viewId.slice(1) + 'PDF';
+  },
+
+  generateAnnexureLivePreview(viewId, delay = 0) {
+    const exportFnName = this.getAnnexureExportFnName(viewId);
+    if (typeof window[exportFnName] !== 'function') return;
+
+    clearTimeout(this._annexureRefreshTimers[viewId]);
+    this._annexureRefreshTimers[viewId] = setTimeout(() => {
+      const runExport = () => {
+        if (this.currentView && this.currentView !== viewId) return;
+        try {
+          window[exportFnName](null, true);
+        } catch (err) {
+          console.error(`Live preview failed for ${viewId}:`, err);
+          if (typeof toast === 'function') toast('Live preview could not be generated. Please try refresh.', 'error');
+        }
+      };
+
+      if (typeof ensurePortalVendors === 'function') {
+        ensurePortalVendors(['jspdf', 'autotable']).then(runExport).catch(err => {
+          console.error(`PDF tools failed for ${viewId}:`, err);
+          if (typeof toast === 'function') toast('PDF preview tools could not load. Please check your connection.', 'error');
+        });
+      } else {
+        runExport();
+      }
+    }, delay);
   },
 
   /** Build a simple A4-style page image from title + body text */
@@ -835,6 +841,7 @@ function setAnnexurePreviewIframeSrc(viewId, src) {
   const iframe = getAnnexurePreviewIframe(viewId);
   if (!iframe) return null;
   iframe.style.display = 'block';
+  iframe.removeAttribute('srcdoc');
   iframe.src = src || 'about:blank';
   return iframe;
 }

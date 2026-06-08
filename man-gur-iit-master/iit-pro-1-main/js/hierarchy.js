@@ -264,6 +264,17 @@ function getFirstAllowedView() {
   return preferredViews.find(viewId => hasModuleAccess(viewId) && document.getElementById('view-' + viewId)) || 'dashboard';
 }
 
+function getFirstAllowedProjectView() {
+  const projectViews = [
+    'front-matter', 'chapters', 'plates', 'graphs',
+    'anx1', 'anx2', 'anx3', 'anx4', 'anx5', 'anx6', 'anx7',
+    'annexure-b', 'annexure-c', 'annexure-d', 'annexure-e', 'annexure-f',
+    'annexure-g', 'annexure-h', 'annexure-i', 'annexure-j', 'annexure-k',
+    'sdlc-portal', 'workflow', 'history'
+  ];
+  return projectViews.find(viewId => hasModuleAccess(viewId) && document.getElementById('view-' + viewId)) || 'projects';
+}
+
 function showUnauthorizedAccessError() {
   const message = 'Access not provided. You are not authorized to access this section.';
   if (typeof toast === 'function') toast(message, 'error');
@@ -336,6 +347,7 @@ function lockFormElement(el, locked, label) {
 function isNavigationOrSafeButton(btn) {
   const onclickAttr = btn.getAttribute('onclick') || '';
   return btn.closest('#reviewer-actions') ||
+    btn.closest('#reviewer-floating-notes') ||
     btn.closest('.top-nav') ||
     btn.closest('.header-row') ||
     btn.closest('.tb-dropdown-menu') ||
@@ -576,7 +588,7 @@ function enforceActiveViewHierarchy(force = false) {
   const label = `${getRoleRule().label} cannot edit this section`;
 
   activeView.querySelectorAll('input, textarea, select').forEach(el => {
-    if (el.closest('#modal-review') || el.id === 'dash-district-filter' || el.closest('#reviewer-actions')) return;
+    if (el.closest('#modal-review') || el.id === 'dash-district-filter' || el.closest('#reviewer-actions') || el.closest('#reviewer-floating-notes')) return;
     lockFormElement(el, !canEdit, label);
   });
 

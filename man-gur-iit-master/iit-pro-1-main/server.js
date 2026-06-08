@@ -5,13 +5,18 @@ const { spawn } = require('child_process');
 
 const PORT = 8081;
 
-// Start build.js in watch mode as a child process
-console.log('Starting compilation watcher...');
-const watcher = spawn('node', ['build.js', '--watch'], { stdio: 'inherit' });
+// Start build.js in watch mode for local development. Disable it for public tunnel demos.
+let watcher = null;
+if (process.env.DSR_NO_WATCH !== '1') {
+  console.log('Starting compilation watcher...');
+  watcher = spawn('node', ['build.js', '--watch'], { stdio: 'inherit' });
 
-watcher.on('error', (err) => {
-  console.error('Failed to start build watcher:', err);
-});
+  watcher.on('error', (err) => {
+    console.error('Failed to start build watcher:', err);
+  });
+} else {
+  console.log('Compilation watcher disabled for stable tunnel serving.');
+}
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -214,11 +219,27 @@ const server = http.createServer((req, res) => {
             return;
           }
 
+          const email = String(username || '').toLowerCase();
+          let role = 'ROLE_OFFICER';
+          if (email.includes('admin')) role = 'ROLE_ADMIN';
+          else if (email.includes('iit')) role = 'ROLE_IIT_ROPAR';
+          else if (email.includes('sdo')) role = 'ROLE_SDO';
+          else if (email.includes('sdlc')) role = 'ROLE_SDLC';
+          else if (email.includes('gis')) role = 'ROLE_GIS';
+          else if (email.includes('je')) role = 'ROLE_JE';
+          else if (email.includes('axen')) role = 'ROLE_AXEN';
+          else if (email.includes('reviewer')) role = 'ROLE_REVIEWER';
+
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({
             token: 'local-demo-token',
             username,
-            role: username.toLowerCase().includes('reviewer') ? 'ROLE_REVIEWER' : 'ROLE_OFFICER'
+            email: username,
+            fullName: username.split('@')[0].replace(/[._-]+/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+            role,
+            permissions: role === 'ROLE_ADMIN' ? ['UPLOAD', 'REVIEW', 'ADMIN'] : [],
+            scope: {},
+            accessLabel: role.replace('ROLE_', '').replace(/_/g, ' ')
           }));
         } catch (e) {
           res.writeHead(400, { 'Content-Type': 'application/json' });

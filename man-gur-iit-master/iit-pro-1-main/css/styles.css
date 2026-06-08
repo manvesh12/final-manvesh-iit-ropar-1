@@ -4528,3 +4528,164 @@ body:not(.view-dashboard-active) .sidebar {
     padding-right: 10px !important;
   }
 }
+
+/* Practical responsive hardening for project/editor screens */
+@media (max-width: 1280px) {
+  body.preview-open .app-workspace,
+  .app-workspace.preview-open {
+    grid-template-columns: minmax(0, 58%) minmax(360px, 42%) !important;
+  }
+
+  body:not(.view-dashboard-active) .page-body {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+
+  .pdf-preview-actions {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .pdf-preview-actions-center {
+    flex: 1 1 180px;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 980px) {
+  .header-row {
+    gap: 12px !important;
+  }
+
+  .header-row > div:first-child,
+  .header-row > div:last-child {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-row > div:last-child,
+  .section-footer,
+  .final-actions,
+  .proj-card-actions,
+  .anx-table-live-actions {
+    justify-content: flex-start !important;
+  }
+
+  .final-actions {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .final-actions .btn {
+    margin-left: 0 !important;
+  }
+
+  .page-title {
+    font-size: clamp(20px, 4vw, 28px);
+    line-height: 1.18;
+  }
+
+  .card-bd,
+  .view[id^="view-anx"] .card-bd,
+  .view[id^="view-annexure-"] .card-bd {
+    padding: 14px !important;
+  }
+
+  .tbl-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .anx-tbl {
+    min-width: 720px;
+    font-size: 12px;
+  }
+
+  .anx-tbl th,
+  .anx-tbl td {
+    padding: 8px 9px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 768px) {
+  body.preview-open .app-workspace,
+  .app-workspace.preview-open {
+    grid-template-columns: 1fr !important;
+  }
+
+  body:not(.view-dashboard-active) .app-workspace {
+    padding-top: calc(var(--topbar-h) + 58px) !important;
+  }
+
+  body.preview-open .pdf-preview-mobile-tabs {
+    display: flex !important;
+  }
+
+  .pdf-preview-actions {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .pdf-preview-action-label {
+    display: none;
+  }
+
+  .pdf-preview-action-btn {
+    min-width: 40px;
+  }
+
+  .pdf-preview-action-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .pdf-preview-live-badge {
+    display: none;
+  }
+
+  .pdf-preview-header-title {
+    font-size: 13px;
+  }
+
+  .proj-card-top,
+  .proj-card-bd {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+}
+
+@media (max-width: 520px) {
+  body:not(.view-dashboard-active) .page-body {
+    padding: 16px 10px 28px !important;
+  }
+
+  .header-row .btn,
+  .section-footer .btn,
+  .final-actions .btn,
+  .anx-table-live-actions .btn,
+  .proj-card-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .notif {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .anx-section-header {
+    align-items: stretch !important;
+  }
+
+  .anx-section-header .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .anx-tbl {
+    min-width: 640px;
+  }
+}

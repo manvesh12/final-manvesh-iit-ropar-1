@@ -107,18 +107,23 @@
   </div>
 
   <!-- Reviewer Floating Notes Box -->
-  <div id="reviewer-floating-notes" style="display:none; position:fixed; bottom:20px; right:20px; width:340px; background:var(--card); border:1px solid var(--border); box-shadow:0 8px 30px rgba(0,0,0,0.12); border-radius:12px; z-index:9999; flex-direction:column; overflow:hidden;">
-    <div style="background:var(--primary); color:white; padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">
-      <div style="font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px;">
+  <div id="reviewer-floating-notes" class="reviewer-floating-notes" style="display:none;">
+    <div class="reviewer-notes-header">
+      <div style="font-weight:700; font-size:13px; display:flex; align-items:center; gap:8px; min-width:0;">
         <i data-lucide="edit-3" style="width:16px; height:16px;"></i> Reviewer Notes
       </div>
-      <div style="font-size:11px; opacity:0.8; font-weight:600; text-transform:uppercase;" id="reviewer-notes-section-title">FRONT MATTER</div>
+      <div class="reviewer-notes-header-actions">
+        <div style="font-size:11px; opacity:0.85; font-weight:600; text-transform:uppercase; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" id="reviewer-notes-section-title">FRONT MATTER</div>
+        <button type="button" class="reviewer-notes-icon-btn" id="reviewer-notes-minimize-btn" onclick="toggleReviewerNotesMinimized()" title="Minimize reviewer notes" aria-label="Minimize reviewer notes">
+          <i data-lucide="minus" style="width:14px; height:14px;"></i>
+        </button>
+      </div>
     </div>
-    <div style="padding:16px;">
+    <div id="reviewer-notes-body" class="reviewer-notes-body">
       <label style="display:block; font-size:12px; font-weight:600; color:var(--text-mid); margin-bottom:8px;">Notes for this section:</label>
       <textarea id="reviewer-section-note" oninput="saveReviewerNote()" style="width:100%; box-sizing:border-box; height:100px; padding:10px; border:1px solid var(--border-2); border-radius:8px; font-size:13px; font-family:inherit; resize:none;" placeholder="Write any required changes or feedback here..."></textarea>
     </div>
-    <div style="padding:12px 16px; border-top:1px solid var(--border); background:var(--bg); display:flex; justify-content:space-between; align-items:center;">
+    <div id="reviewer-notes-footer" class="reviewer-notes-footer">
       <span style="font-size:11px; color:var(--text-soft);">Auto-saved locally</span>
       <button class="btn btn-saffron btn-sm" onclick="openReviewModal()">Review & Return →</button>
     </div>
