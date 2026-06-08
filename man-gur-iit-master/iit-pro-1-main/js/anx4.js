@@ -395,10 +395,16 @@ function uploadRoutes(event, btn) {
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
       if (rows.length < 2) { toast("No data rows found", "warn"); return; }
       const dataRows = rows.slice(1).filter(r => r.some(c => c !== ""));
-      tbody.innerHTML = dataRows.map(r => renderRouteRow([
+      const uploadRows = dataRows.map(r => [
         r[0] || "", r[1] || "", r[2] || "", r[3] || "", r[4] || "", r[5] || "",
         r[6] || "Unpaved", r[7] || "Unpaved", r[8] || "Lease Owner", r[9] || "Route Map attached"
-      ])).join("");
+      ]);
+      const table = card.querySelector('table');
+      if (typeof rbacApplyExcelRowsToTable === 'function') {
+        rbacApplyExcelRowsToTable(table, uploadRows, row => tbody.insertAdjacentHTML('beforeend', renderRouteRow(row)));
+      } else {
+        tbody.innerHTML = uploadRows.map(renderRouteRow).join("");
+      }
       if (window.initLucide) window.initLucide();
       toast(`Loaded ${dataRows.length} route(s) into ${title} âœ“`, "success");
     } catch (err) { toast("Error reading file: " + err.message, "error"); }
@@ -423,10 +429,16 @@ function uploadClusters(event, btn) {
       const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: "" });
       if (rows.length < 2) { toast("No data rows found", "warn"); return; }
       const dataRows = rows.slice(1).filter(r => r.some(c => c !== ""));
-      tbody.innerHTML = dataRows.map(r => renderClusterRow([
+      const uploadRows = dataRows.map(r => [
         r[0] || "", r[1] || "", r[2] || "", r[3] || "", r[4] || "",
         r[5] || "Unpaved", r[6] || "Unpaved", r[7] || "Lease Owner", r[8] || "Route Map attached"
-      ])).join("");
+      ]);
+      const table = card.querySelector('table');
+      if (typeof rbacApplyExcelRowsToTable === 'function') {
+        rbacApplyExcelRowsToTable(table, uploadRows, row => tbody.insertAdjacentHTML('beforeend', renderClusterRow(row)));
+      } else {
+        tbody.innerHTML = uploadRows.map(renderClusterRow).join("");
+      }
       if (window.initLucide) window.initLucide();
       toast(`Loaded ${dataRows.length} cluster route(s) into ${title} âœ“`, "success");
     } catch (err) { toast("Error reading file: " + err.message, "error"); }
@@ -875,4 +887,3 @@ document.addEventListener('input', (e) => {
     }, 1500); // 1.5 seconds after typing stops
   }
 });
-

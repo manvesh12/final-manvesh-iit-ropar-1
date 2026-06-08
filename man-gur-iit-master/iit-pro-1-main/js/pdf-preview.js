@@ -172,9 +172,16 @@ const pdfPreview = {
           };
           const exportFnName = getExportFnName(viewId);
           if (typeof window[exportFnName] === 'function') {
-            setTimeout(() => {
-              window[exportFnName](null, true);
-            }, 300);
+            const generateLivePreview = () => {
+              const runExport = () => window[exportFnName](null, true);
+              if (typeof ensurePortalVendors === 'function') {
+                ensurePortalVendors(['jspdf', 'autotable']).then(runExport).catch(() => {});
+              } else {
+                runExport();
+              }
+            };
+            if (typeof runWhenIdle === 'function') runWhenIdle(generateLivePreview, 1200);
+            else setTimeout(generateLivePreview, 700);
           }
         }
       }

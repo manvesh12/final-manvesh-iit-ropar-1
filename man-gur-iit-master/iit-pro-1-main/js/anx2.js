@@ -101,9 +101,7 @@ function processExcelDataAnx2(rows, sectionType, tableId) {
     if (sectionType === 'D') tableId = 'anx2-msand';
   }
 
-  const tbody = document.getElementById(tableId).querySelector('tbody');
-  tbody.innerHTML = ''; 
-
+  const uploadRows = [];
   dataRows.forEach((rowData, index) => {
     while (rowData.length < 18) rowData.push(""); 
 
@@ -202,8 +200,15 @@ function processExcelDataAnx2(rows, sectionType, tableId) {
         actionBtn
       ];
     }
-    addRowAnx2(tableId, cellDataArray);
+    uploadRows.push(cellDataArray);
   });
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(tableId, uploadRows, row => addRowAnx2(tableId, row));
+  } else {
+    const tbody = document.getElementById(tableId).querySelector('tbody');
+    tbody.innerHTML = '';
+    uploadRows.forEach(row => addRowAnx2(tableId, row));
+  }
 
   if (sectionType === 'B') updatePattaGrandTotals();
   if (sectionType === 'C') updateDesiltGrandTotals();

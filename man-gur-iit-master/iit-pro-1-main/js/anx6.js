@@ -340,16 +340,46 @@ function processExcelDataAnx6(rows, sectionType) {
   if (!mapped.length) throw new Error('No valid rows found.');
 
   if (sectionType === 'cluster') {
-    anx6ClusterData = mapped;
+    anx6ClusterData = mergeAnx6UploadByRole(anx6ClusterData, mapped, 'anx6-final-clusters', ['river', 'cluster', 'lease', 'location', 'village', 'area', 'excavation', 'mineral']);
     renderAnx6Clusters();
   } else {
-    anx6ContiguousData = mapped;
+    anx6ContiguousData = mergeAnx6UploadByRole(anx6ContiguousData, mapped, 'anx6-contiguous-clusters', ['river', 'contiguous', 'cluster', 'leases', 'location', 'distance', 'village', 'area', 'mineral']);
     renderAnx6Contiguous();
   }
 
   toast(`Uploaded ${mapped.length} Annexure VI ${sectionType === 'cluster' ? 'cluster' : 'contiguous cluster'} row(s).`, 'success');
 }
 window.processExcelDataAnx6 = processExcelDataAnx6;
+
+function mergeAnx6UploadByRole(existingRows, uploadedRows, tableId, columnKeys) {
+  const table = document.getElementById(tableId);
+  const editableColumns = typeof getEditableColumnsForTable === 'function' ? getEditableColumnsForTable(table) : null;
+  if (editableColumns === null) return uploadedRows;
+  const allowed = Array.isArray(editableColumns) ? editableColumns : [];
+  let protectedCells = 0;
+
+  const merged = uploadedRows.map((incoming, rowIndex) => {
+    const current = existingRows[rowIndex] || {};
+    const out = { ...current };
+    columnKeys.forEach((key, idx) => {
+      if (allowed.includes(idx + 1)) out[key] = incoming[key];
+      else {
+        if (!(key in out)) out[key] = 'LOCKED';
+        protectedCells += 1;
+      }
+    });
+    return out;
+  });
+
+  if (existingRows.length > uploadedRows.length) {
+    merged.push(...existingRows.slice(uploadedRows.length));
+  }
+
+  if (protectedCells && typeof toast === 'function') {
+    toast(`${protectedCells} locked cell(s) were protected during Excel sync.`, 'info');
+  }
+  return merged;
+}
 
 function columnValueAnx6(row, header, aliases) {
   const normalizedHeaders = header.map(normalizeHeaderAnx6);

@@ -209,6 +209,61 @@ function exportContXlsx() {
   XLSX.writeFile(wb, 'Contiguous_Clusters_Export.xlsx');
 }
 
+function textFromAnx3Cell(cell) {
+  if (!cell) return '';
+  const select = cell.querySelector('select');
+  if (select) return select.value || '';
+  return (cell.textContent || '').trim();
+}
+
+function numberFromAnx3Cell(cell) {
+  return parseFloat(textFromAnx3Cell(cell).replace(/,/g, '')) || 0;
+}
+
+function syncAnx3ClusterDataFromTable() {
+  const rows = Array.from(document.querySelectorAll('#anx3-clusters tbody tr'));
+  clusterData = rows.map(row => {
+    const cells = row.children;
+    return {
+      river: textFromAnx3Cell(cells[0]),
+      cluster: textFromAnx3Cell(cells[1]),
+      lease: textFromAnx3Cell(cells[2]),
+      location: textFromAnx3Cell(cells[3]) || 'Riverbed',
+      village: textFromAnx3Cell(cells[4]),
+      area: numberFromAnx3Cell(cells[5]),
+      excav: numberFromAnx3Cell(cells[6])
+    };
+  }).filter(row => Object.values(row).some(value => value !== '' && value !== 0));
+}
+
+function syncAnx3ContDataFromTable() {
+  const rows = Array.from(document.querySelectorAll('#anx3-contiguous tbody tr'));
+  contData = rows.map(row => {
+    const cells = row.children;
+    return {
+      river: textFromAnx3Cell(cells[0]),
+      ccNo: textFromAnx3Cell(cells[1]),
+      clusterNo: textFromAnx3Cell(cells[2]),
+      leases: textFromAnx3Cell(cells[3]),
+      location: textFromAnx3Cell(cells[4]) || 'Riverbed',
+      distance: textFromAnx3Cell(cells[5]),
+      village: textFromAnx3Cell(cells[6]),
+      area: numberFromAnx3Cell(cells[7]),
+      mineral: numberFromAnx3Cell(cells[8])
+    };
+  }).filter(row => Object.values(row).some(value => value !== '' && value !== 0));
+}
+
+function applyRbacAnx3Upload(tableId, rows, appendRow, syncData, beforeFullReplace) {
+  if (typeof rbacApplyExcelRowsToTable !== 'function') return false;
+  const table = document.getElementById(tableId);
+  const fullAccess = typeof getEditableColumnsForTable === 'function' && getEditableColumnsForTable(table) === null;
+  if (fullAccess && typeof beforeFullReplace === 'function') beforeFullReplace();
+  const result = rbacApplyExcelRowsToTable(tableId, rows, appendRow);
+  syncData();
+  return result !== false;
+}
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    UPLOAD EXCEL â†’ PARSE â†’ FILL TABLE
    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
@@ -224,6 +279,69 @@ function uploadExcel(event, type) {
       if (rows.length < 2) { alert('No data rows found in Excel.'); return; }
 
       const dataRows = rows.slice(1).filter(r => r.some(c => c !== ''));
+
+      if (type === 'cluster') {
+        const uploadRows = dataRows.map(r => [
+          String(r[0] || ''),
+          String(r[1] || ''),
+          String(r[2] || ''),
+          String(r[3] || 'Riverbed'),
+          String(r[4] || ''),
+          parseFloat(r[5]) || 0,
+          parseFloat(r[6]) || 0,
+          ((parseFloat(r[6]) || 0) * 0.6).toFixed(2)
+        ]);
+        if (uploadRows.length === 0) { alert('No valid rows found.'); return; }
+        if (applyRbacAnx3Upload('anx3-clusters', uploadRows, row => {
+          clusterData.push({
+            river: String(row[0] || ''),
+            cluster: String(row[1] || ''),
+            lease: String(row[2] || ''),
+            location: String(row[3] || 'Riverbed'),
+            village: String(row[4] || ''),
+            area: parseFloat(row[5]) || 0,
+            excav: parseFloat(row[6]) || 0
+          });
+          renderCluster();
+        }, syncAnx3ClusterDataFromTable, () => { clusterData = []; })) {
+          renderCluster();
+          if (typeof enforceActiveViewHierarchy === 'function') enforceActiveViewHierarchy(true);
+          alert(`Loaded ${clusterData.length} cluster row(s) from Excel. Locked columns were preserved.`);
+          return;
+        }
+      } else {
+        const uploadRows = dataRows.map(r => [
+          String(r[0] || ''),
+          String(r[1] || ''),
+          String(r[2] || ''),
+          String(r[3] || ''),
+          String(r[4] || 'Riverbed'),
+          String(r[5] || ''),
+          String(r[6] || ''),
+          parseFloat(r[7]) || 0,
+          parseFloat(r[8]) || 0
+        ]);
+        if (uploadRows.length === 0) { alert('No valid rows found.'); return; }
+        if (applyRbacAnx3Upload('anx3-contiguous', uploadRows, row => {
+          contData.push({
+            river: String(row[0] || ''),
+            ccNo: String(row[1] || ''),
+            clusterNo: String(row[2] || ''),
+            leases: String(row[3] || ''),
+            location: String(row[4] || 'Riverbed'),
+            distance: String(row[5] || ''),
+            village: String(row[6] || ''),
+            area: parseFloat(row[7]) || 0,
+            mineral: parseFloat(row[8]) || 0
+          });
+          renderContigous();
+        }, syncAnx3ContDataFromTable, () => { contData = []; })) {
+          renderContigous();
+          if (typeof enforceActiveViewHierarchy === 'function') enforceActiveViewHierarchy(true);
+          alert(`Loaded ${contData.length} contiguous cluster row(s) from Excel. Locked columns were preserved.`);
+          return;
+        }
+      }
 
       if (type === 'cluster') {
         clusterData = dataRows.map(r => ({

@@ -295,6 +295,7 @@ async function showAppScreen() {
 
   if (window.initLucide) initLucide();
   if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
+  if (typeof preloadPortalVendorsAfterLogin === 'function') preloadPortalVendorsAfterLogin();
 }
 
 function showAuthorityScreen() {

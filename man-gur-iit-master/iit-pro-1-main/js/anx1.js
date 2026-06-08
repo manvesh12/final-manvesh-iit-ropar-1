@@ -95,9 +95,7 @@ function processExcelData(rows, sectionType) {
   if (sectionType === 'C') tableId = 'anx1-patta';
   if (sectionType === 'D') tableId = 'anx1-msand';
 
-  const tbody = document.getElementById(tableId).querySelector('tbody');
-  tbody.innerHTML = ''; 
-
+  const uploadRows = [];
   dataRows.forEach(rowData => {
     while (rowData.length < 8) rowData.push(""); 
 
@@ -122,8 +120,15 @@ function processExcelData(rows, sectionType) {
     else if (sectionType === 'D') {
       cellDataArray = [rowData[0], rowData[1], rowData[2], rowData[3], rowData[4], rowData[5], rowData[6], actionBtn];
     }
-    addRowAnx1(tableId, cellDataArray);
+    uploadRows.push(cellDataArray);
   });
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(tableId, uploadRows, row => addRowAnx1(tableId, row));
+  } else {
+    const tbody = document.getElementById(tableId).querySelector('tbody');
+    tbody.innerHTML = '';
+    uploadRows.forEach(row => addRowAnx1(tableId, row));
+  }
   toast(`Uploaded section ${sectionType} data successfully`, 'success');
 }
 

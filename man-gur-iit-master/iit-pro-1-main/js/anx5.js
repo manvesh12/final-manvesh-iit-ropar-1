@@ -128,9 +128,7 @@ function processExcelDataAnx5(rows, sectionType, tableId) {
     if (sectionType === 'D') tableId = 'anx5-msand';
   }
 
-  const tbody = document.getElementById(tableId).querySelector('tbody');
-  tbody.innerHTML = '';
-
+  const uploadRows = [];
   dataRows.forEach((rowData, index) => {
     while (rowData.length < 18) rowData.push("");
 
@@ -228,8 +226,15 @@ function processExcelDataAnx5(rows, sectionType, tableId) {
         actionBtn
       ];
     }
-    addRowAnx5(tableId, cellDataArray);
+    uploadRows.push(cellDataArray);
   });
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(tableId, uploadRows, row => addRowAnx5(tableId, row));
+  } else {
+    const tbody = document.getElementById(tableId).querySelector('tbody');
+    tbody.innerHTML = '';
+    uploadRows.forEach(row => addRowAnx5(tableId, row));
+  }
 
   recalcAnx5Totals();
   toast(`Uploaded section ${sectionType} data successfully`, 'success');

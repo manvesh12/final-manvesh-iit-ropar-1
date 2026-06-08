@@ -434,7 +434,13 @@ function mapClusterRowAnx7(row) {
 
 function fillRouteCardAnx7(card, dataRows, fileName) {
   const tbody = card.querySelector('.anx7-route-table-body');
-  tbody.innerHTML = dataRows.map((row, index) => renderRouteRowAnx7(mapRouteRowAnx7(row, index))).join('');
+  const uploadRows = dataRows.map((row, index) => mapRouteRowAnx7(row, index));
+  const table = card.querySelector('table');
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(table, uploadRows, row => tbody.insertAdjacentHTML('beforeend', renderRouteRowAnx7(row)));
+  } else {
+    tbody.innerHTML = uploadRows.map(renderRouteRowAnx7).join('');
+  }
   renumberRouteRowsAnx7(tbody);
   card.dataset.uploadedExcel = fileName || '';
   card.dataset.validationState = 'valid';
@@ -443,7 +449,13 @@ function fillRouteCardAnx7(card, dataRows, fileName) {
 
 function fillClusterCardAnx7(card, dataRows, fileName) {
   const tbody = card.querySelector('.anx7-cluster-table-body');
-  tbody.innerHTML = dataRows.map(row => renderClusterRowAnx7(mapClusterRowAnx7(row))).join('');
+  const uploadRows = dataRows.map(row => mapClusterRowAnx7(row));
+  const table = card.querySelector('table');
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(table, uploadRows, row => tbody.insertAdjacentHTML('beforeend', renderClusterRowAnx7(row)));
+  } else {
+    tbody.innerHTML = uploadRows.map(renderClusterRowAnx7).join('');
+  }
   card.dataset.uploadedExcel = fileName || '';
   card.dataset.validationState = 'valid';
   card.dataset.exportState = 'dirty';

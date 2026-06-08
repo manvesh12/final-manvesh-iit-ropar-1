@@ -390,6 +390,107 @@ function getTableColumnPolicy(role, viewId, table) {
   return policy.default || null;
 }
 
+function getEditableColumnsForTable(table) {
+  const role = getBackendRole();
+  const view = table?.closest?.('.view');
+  const viewId = view ? view.id.replace('view-', '') : '';
+  const rule = getRoleRule();
+  const fullAccess = role === 'ADMIN' || role === 'OFFICER' || role === 'DATA_ENTRY';
+  if (fullAccess) return null;
+  return getTableColumnPolicy(role, viewId, table) || rule.annexureColumns || [];
+}
+
+function isActionCellContent(value) {
+  const text = String(value === undefined || value === null ? '' : value);
+  return /<button|onclick=|btn-danger|trash-2/i.test(text);
+}
+
+function setRbacUploadCellValue(cell, value) {
+  if (!cell) return;
+  const valueText = String(value === undefined || value === null || value === '' ? 'NUL' : value);
+  const select = cell.querySelector('select');
+  if (select && !String(valueText).includes('<select')) {
+    const match = Array.from(select.options).find(opt => opt.text.trim().toLowerCase() === valueText.trim().toLowerCase());
+    if (match) select.value = match.value;
+    return;
+  }
+  if (String(valueText).includes('<select') || String(valueText).includes('<button')) {
+    cell.innerHTML = valueText;
+  } else {
+    cell.textContent = valueText;
+  }
+}
+
+function buildSafeUploadRowForTable(table, rowData, editableColumns) {
+  if (!Array.isArray(rowData)) return [];
+  if (!editableColumns) return rowData.slice();
+  return rowData.map((value, idx) => {
+    const colNo = idx + 1;
+    if (isActionCellContent(value)) return value;
+    return editableColumns.includes(colNo) ? value : 'LOCKED';
+  });
+}
+
+function rbacApplyExcelRowsToTable(tableOrId, rows, addRowFn, options = {}) {
+  const table = typeof tableOrId === 'string' ? document.getElementById(tableOrId) : tableOrId;
+  const tbody = table ? table.querySelector('tbody') : null;
+  if (!table || !tbody || !Array.isArray(rows)) return { updated: 0, protected: 0 };
+
+  const editableColumns = getEditableColumnsForTable(table);
+  const fullAccess = editableColumns === null;
+  const addRow = typeof addRowFn === 'function'
+    ? addRowFn
+    : (row) => {
+      const tr = document.createElement('tr');
+      row.forEach(value => {
+        const td = document.createElement('td');
+        setRbacUploadCellValue(td, value);
+        if (!isActionCellContent(value)) td.contentEditable = 'true';
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    };
+
+  if (fullAccess || options.replaceForPartial === true) {
+    tbody.innerHTML = '';
+    rows.forEach(row => addRow(row));
+    if (typeof enforceActiveViewHierarchy === 'function') enforceActiveViewHierarchy(true);
+    return { updated: rows.length, protected: 0 };
+  }
+
+  let updated = 0;
+  let protectedCells = 0;
+
+  rows.forEach((rowData, rowIndex) => {
+    let row = tbody.rows[rowIndex];
+    if (!row) {
+      addRow(buildSafeUploadRowForTable(table, rowData, editableColumns));
+      row = tbody.rows[rowIndex];
+    }
+    if (!row) return;
+
+    Array.from(rowData).forEach((value, idx) => {
+      if (isActionCellContent(value)) return;
+      const colNo = idx + 1;
+      const cell = row.children[idx];
+      if (!editableColumns.includes(colNo)) {
+        protectedCells += 1;
+        return;
+      }
+      setRbacUploadCellValue(cell, value);
+    });
+    updated += 1;
+  });
+
+  if (typeof enforceActiveViewHierarchy === 'function') enforceActiveViewHierarchy(true);
+  if (typeof initLucide === 'function') initLucide();
+
+  if (protectedCells && typeof toast === 'function' && options.silent !== true) {
+    toast(`${protectedCells} locked cell(s) were protected during Excel sync.`, 'info');
+  }
+  return { updated, protected: protectedCells };
+}
+
 function applyAnnexureColumnLocks(root) {
   const container = root || document.querySelector('.view.active');
   if (!container) return;

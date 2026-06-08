@@ -254,6 +254,14 @@ async function renderDashboard() {
   initLucide();
 }
 
+let projectRenderLimit = 60;
+
+function showMoreProjects() {
+  projectRenderLimit += 60;
+  renderProjects();
+}
+window.showMoreProjects = showMoreProjects;
+
 function renderProjects() {
   updateTopBarProjectsDropdown();
   const grid = document.getElementById('projects-grid');
@@ -315,7 +323,8 @@ function renderProjects() {
     return '<span style="color:var(--text-soft)">Initial Project Setup</span>';
   }
 
-  grid.innerHTML = filteredProjs.map(p=>`
+  const visibleProjects = filteredProjs.slice(0, projectRenderLimit);
+  grid.innerHTML = visibleProjects.map(p=>`
     <div class="proj-card">
       <div class="proj-card-top" style="cursor:pointer" onclick="openProject(${p.id})">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:8px;">
@@ -351,6 +360,12 @@ function renderProjects() {
         </div>
       </div>
     </div>`).join('');
+  if (filteredProjs.length > visibleProjects.length) {
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="projects-load-more">
+        <button type="button" class="btn btn-outline" onclick="showMoreProjects()">Show ${Math.min(60, filteredProjs.length - visibleProjects.length)} more projects</button>
+      </div>`);
+  }
   renderDistrictLegends();
   if (typeof refreshDistrictBadgesInDOM === 'function') refreshDistrictBadgesInDOM();
   if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();

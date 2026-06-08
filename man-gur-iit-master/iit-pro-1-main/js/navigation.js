@@ -350,6 +350,9 @@ function showView(id, btn, push = true) {
     }
     return;
   }
+  if (typeof ensurePortalAssetsForView === 'function' && !ensurePortalAssetsForView(id, () => showView(id, btn, push))) {
+    return;
+  }
   // Hide flyout menus whenever a main view changes
   document.querySelectorAll('.flyout-menu').forEach(m => m.style.display = 'none');
 
@@ -388,7 +391,7 @@ function showView(id, btn, push = true) {
           mainContent.scrollLeft = 0;
         }
       } else {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+        el.scrollIntoView({ behavior: 'auto', block: 'start', inline: 'nearest' });
         if (mainContent) mainContent.scrollLeft = 0;
       }
       document.documentElement.scrollLeft = 0;
@@ -493,18 +496,32 @@ function showView(id, btn, push = true) {
   addCoreAnnexureTableControls(id);
 
   const previewSections = ['front-matter', 'chapters', 'plates', 'anx1', 'anx2', 'anx3', 'anx4', 'anx5', 'anx6', 'anx7', 'annexure-b', 'annexure-c', 'annexure-d', 'annexure-e', 'annexure-f', 'annexure-g', 'annexure-h', 'annexure-i', 'annexure-j', 'annexure-k'];
+  if (window.portalPreviewTimer) {
+    clearTimeout(window.portalPreviewTimer);
+    window.portalPreviewTimer = null;
+  }
   if (previewSections.includes(id)) {
-    if (window.pdfPreview) window.pdfPreview.show(id);
+    const openPreview = () => {
+      if (currentViewId === id && window.pdfPreview) window.pdfPreview.show(id);
+    };
+    if (typeof runWhenIdle === 'function') {
+      window.portalPreviewTimer = runWhenIdle(openPreview, 900);
+    } else {
+      window.portalPreviewTimer = setTimeout(openPreview, 250);
+    }
   } else {
     if (window.pdfPreview) window.pdfPreview.hide();
   }
 
-  renderDistrictLegends();
-  initLucide();
+  if (id === 'dashboard' || id === 'projects') {
+    renderDistrictLegends();
+  } else if (typeof runWhenIdle === 'function') {
+    runWhenIdle(() => renderDistrictLegends(), 900);
+  }
+  initLucide(el || document);
 
   if (typeof enforceReviewerReadOnly === 'function') {
-    setTimeout(enforceReviewerReadOnly, 100);
-    setTimeout(enforceReviewerReadOnly, 500); // safety net for slower renders
+    requestAnimationFrame(() => enforceReviewerReadOnly());
   }
 
   if (typeof loadReviewerNoteForView === 'function') {
@@ -526,8 +543,19 @@ function initLucide(root) {
     lucideRenderQueued = false;
     if (!window.lucide) return;
     try {
-      if (root && root.querySelector) window.lucide.createIcons({ nodes: root.querySelectorAll('i[data-lucide]') });
-      else window.lucide.createIcons();
+      if (root && root.querySelector) {
+        window.lucide.createIcons({ nodes: root.querySelectorAll('i[data-lucide]') });
+        return;
+      }
+      const scopedNodes = document.querySelectorAll([
+        '.view.active i[data-lucide]',
+        '.topbar i[data-lucide]',
+        '.sidebar i[data-lucide]',
+        '.modal.open i[data-lucide]',
+        '#screen-auth.active i[data-lucide]',
+        '.toast i[data-lucide]'
+      ].join(','));
+      window.lucide.createIcons({ nodes: scopedNodes });
     } catch (err) {
       window.lucide.createIcons();
     }

@@ -168,11 +168,13 @@ function processExcelDataAnnexureK(rows, sectionType, targetTable) {
   const table = targetTable || document.getElementById(cfg.tableId);
   const tbody = table ? table.querySelector('tbody') : null;
   if (!tbody) return;
-  tbody.innerHTML = '';
-
-  dataRows.forEach((rowData, index) => {
-    addRowAnnexureK(table, normalizeAnnexureKRow(rowData, sectionType, index));
-  });
+  const uploadRows = dataRows.map((rowData, index) => normalizeAnnexureKRow(rowData, sectionType, index));
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(table, uploadRows, row => addRowAnnexureK(table, row));
+  } else {
+    tbody.innerHTML = '';
+    uploadRows.forEach(row => addRowAnnexureK(table, row));
+  }
 
   toast(`Uploaded Annexure K ${sectionType === 'PROFORMA' ? 'proforma' : 'annexure a'} data successfully`, 'success');
   if (window.debouncedSaveState) window.debouncedSaveState();

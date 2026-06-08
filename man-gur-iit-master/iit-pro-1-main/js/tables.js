@@ -189,21 +189,39 @@ function populateTableFromSheet(tableId, rows) {
   });
   if (isHeaderRow) cleanRows.shift();
 
-  tbody.innerHTML = '';
-  cleanRows.forEach(row => {
-    const tr = document.createElement('tr');
+  const uploadRows = cleanRows.map(row => {
+    const cells = [];
     headers.forEach((_, index) => {
       let value = row[index] !== undefined ? String(row[index]).trim() : '';
       if (value === '') value = 'NUL';
-      const escaped = value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      tr.insertAdjacentHTML('beforeend', `<td contenteditable>${escaped}</td>`);
+      cells.push(value);
     });
     if (headers.includes('action')) {
       const isReadOnly = isUserReadOnly();
-      tr.insertAdjacentHTML('beforeend', `<td style="${isReadOnly ? 'display:none;' : ''}"><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>`);
+      cells.push(`<button class="btn btn-xs btn-danger" onclick="delRow(this)" style="${isReadOnly ? 'display:none;' : 'display:inline-flex;'}align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button>`);
     }
-    tbody.appendChild(tr);
+    return cells;
   });
+
+  const addUploadedRow = (row) => {
+    const tr = document.createElement('tr');
+    row.forEach(value => {
+      if (/<button|<select/i.test(String(value))) {
+        tr.insertAdjacentHTML('beforeend', `<td>${value}</td>`);
+        return;
+      }
+      const escaped = value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      tr.insertAdjacentHTML('beforeend', `<td contenteditable>${escaped}</td>`);
+    });
+    tbody.appendChild(tr);
+  };
+
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(table, uploadRows, addUploadedRow);
+  } else {
+    tbody.innerHTML = '';
+    uploadRows.forEach(addUploadedRow);
+  }
   if (window.initLucide) window.initLucide();
   return true;
 }

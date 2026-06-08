@@ -9,6 +9,7 @@ const JS_FILES = [
   'js/api.js',
   'js/state.js',
   'js/hierarchy.js',
+  'js/performance.js',
   'js/navigation.js',
   'js/auth.js',
   'js/projects.js',

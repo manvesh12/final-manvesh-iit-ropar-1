@@ -151,12 +151,13 @@ function processExcelDataAnnexureF(rows, sectionType, targetTable) {
   const table = targetTable || document.getElementById(cfg.tableId);
   const tbody = table ? table.querySelector('tbody') : null;
   if (!tbody) return;
-  tbody.innerHTML = '';
-
-  dataRows.forEach((rowData, index) => {
-    const normalized = normalizeAnnexureFRow(rowData, sectionType, index);
-    addRowAnnexureF(table, normalized);
-  });
+  const uploadRows = dataRows.map((rowData, index) => normalizeAnnexureFRow(rowData, sectionType, index));
+  if (typeof rbacApplyExcelRowsToTable === 'function') {
+    rbacApplyExcelRowsToTable(table, uploadRows, row => addRowAnnexureF(table, row));
+  } else {
+    tbody.innerHTML = '';
+    uploadRows.forEach(row => addRowAnnexureF(table, row));
+  }
 
   toast(`Uploaded Annexure F ${sectionType.toLowerCase()} data successfully`, 'success');
   if (window.debouncedSaveState) window.debouncedSaveState();
