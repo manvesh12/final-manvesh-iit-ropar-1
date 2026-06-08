@@ -3,6 +3,44 @@
 ══════════════════════════════════════ */
 let currentDistrictFilter = 'ALL';
 
+function normalizeBackendProjects(data) {
+  const rows = Array.isArray(data) ? data : (Array.isArray(data?.value) ? data.value : []);
+  return rows.map(p => ({
+    id: p.id,
+    title: p.title || p.projectName || `District Survey Report - ${p.district || 'Punjab'}`,
+    projectName: p.projectName || p.title,
+    district: p.district || 'Punjab',
+    year: p.year || '2025-26',
+    mineral: p.mineral || 'Sand',
+    rivers: p.rivers || 'Not specified',
+    progress: Number.isFinite(Number(p.progress)) ? Number(p.progress) : 0,
+    status: p.status === 'IN_PROGRESS' || p.status === 'ACTIVE' ? 'In Progress' : (p.status || 'In Progress'),
+    createdAt: p.createdAt ? new Date(p.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
+    signatures: Number.isFinite(Number(p.signatures)) ? Number(p.signatures) : 0,
+    projectState: p.projectState || null
+  }));
+}
+
+async function refreshProjectsFromBackend(renderAfter = true) {
+  try {
+    const data = await apiFetch('/projects');
+    S.projects = normalizeBackendProjects(data);
+    S.projectLoadError = '';
+    S.projectsLoadedAt = new Date().toLocaleTimeString();
+    updateProjectBadgeCount();
+    updateTopBarProjectsDropdown();
+    if (renderAfter) {
+      renderProjects();
+      if (typeof renderDashboard === 'function') renderDashboard();
+    }
+    return S.projects;
+  } catch (err) {
+    S.projectLoadError = err.message || 'Failed to load projects from backend';
+    if (renderAfter) renderProjects();
+    throw err;
+  }
+}
+
 function updateProjectBadgeCount() {
   const badgeEl = document.getElementById('badge-projs');
   if (badgeEl) badgeEl.textContent = S.projects.length;
@@ -212,6 +250,7 @@ async function renderDashboard() {
   updateActiveDistrictUI(currentDistrictFilter !== 'ALL' ? currentDistrictFilter : (S.activeProject ? S.activeProject.district : 'Punjab'));
   renderDistrictLegends();
   if (typeof refreshDistrictBadgesInDOM === 'function') refreshDistrictBadgesInDOM();
+  if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
   initLucide();
 }
 
@@ -219,6 +258,31 @@ function renderProjects() {
   updateTopBarProjectsDropdown();
   const grid = document.getElementById('projects-grid');
   if (!grid) return;
+
+  const statusEl = document.getElementById('projects-load-status');
+  if (statusEl) {
+    if (S.projectLoadError) {
+      statusEl.textContent = 'Project API error: ' + S.projectLoadError;
+      statusEl.style.color = 'var(--red)';
+    } else {
+      statusEl.textContent = `${S.projects.length} project(s) loaded from backend${S.projectsLoadedAt ? ' at ' + S.projectsLoadedAt : ''}`;
+      statusEl.style.color = 'var(--text-soft)';
+    }
+  }
+
+  if (S.projectLoadError) {
+    grid.innerHTML = `
+      <div class="projects-empty-state">
+        <div class="projects-empty-state__inner">
+          <div class="projects-empty-state__icon"><i data-lucide="alert-triangle" style="width:24px;height:24px;"></i></div>
+          <h3>Projects Not Loading</h3>
+          <p>${S.projectLoadError}</p>
+          <button type="button" class="btn btn-saffron" onclick="initApp()">Retry Load</button>
+        </div>
+      </div>`;
+    initLucide();
+    return;
+  }
   
   const filteredProjs = currentDistrictFilter === 'ALL'
     ? S.projects
@@ -226,6 +290,7 @@ function renderProjects() {
 
   if (filteredProjs.length === 0) {
     const districtHint = currentDistrictFilter === 'ALL' ? '' : ` for ${currentDistrictFilter}`;
+    const canCreateProject = typeof hasAdminAccess === 'function' && hasAdminAccess();
     grid.innerHTML = `
       <div class="projects-empty-state">
         <div class="projects-empty-state__inner">
@@ -233,11 +298,12 @@ function renderProjects() {
             <i data-lucide="folder-plus" style="width:24px; height:24px;"></i>
           </div>
           <h3>No DSR Projects Yet</h3>
-          <p>Click <strong>+ New Project</strong> to create your first district survey report${districtHint}. Created reports will appear here with live progress and signature status.</p>
-          <button type="button" class="btn btn-saffron" onclick="newProjectModal()">+ New Project</button>
+          <p>${canCreateProject ? `Click <strong>+ New Project</strong> to create your first district survey report${districtHint}.` : `No district survey report has been created yet${districtHint}. Once Admin creates a project, it will appear here.`}</p>
+          ${canCreateProject ? `<button type="button" class="btn btn-saffron" onclick="newProjectModal()">+ New Project</button>` : ''}
         </div>
       </div>`;
     initLucide();
+    if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
     return;
   }
 
@@ -287,6 +353,7 @@ function renderProjects() {
     </div>`).join('');
   renderDistrictLegends();
   if (typeof refreshDistrictBadgesInDOM === 'function') refreshDistrictBadgesInDOM();
+  if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
   initLucide();
 }
 
@@ -363,7 +430,8 @@ async function openProject(id) {
     updateSidebarToggleVisibility();
   }
 
-  showView('front-matter',null);
+  const firstAllowedView = typeof getFirstAllowedView === 'function' ? getFirstAllowedView() : 'projects';
+  showView(firstAllowedView, null);
   toast('Opened: '+dist+' DSR Project','info');
 }
 
@@ -492,6 +560,10 @@ function deleteProject(id, event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
+  }
+  if (typeof hasAdminAccess === 'function' && !hasAdminAccess()) {
+    toast('Permission Denied: Only Administrators can delete projects.', 'error');
+    return;
   }
   const proj = S.projects.find(p => p.id === id);
   if (!proj) return;

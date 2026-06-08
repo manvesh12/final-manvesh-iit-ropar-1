@@ -16,6 +16,7 @@ public class AuthService {
     @Autowired AuthenticationManager authenticationManager;
     @Autowired UserRepository userRepository;
     @Autowired JwtUtils jwtUtils;
+    @Autowired PermissionService permissionService;
 
     @Autowired org.springframework.security.crypto.password.PasswordEncoder encoder;
 
@@ -25,7 +26,18 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        return new JwtResponse(jwt, userDetails.getUsername(), userDetails.getAuthorities().iterator().next().getAuthority());
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new JwtResponse(
+                jwt,
+                user.getUsername(),
+                user.getEmail(),
+                user.getFullName(),
+                "ROLE_" + user.getRole().name(),
+                permissionService.permissionsFor(user.getRole()),
+                permissionService.scopeFor(user),
+                permissionService.accessLabel(user.getRole())
+        );
     }
 
     public MessageResponse registerUser(SignupRequest signUpRequest) {

@@ -120,7 +120,7 @@
           <div class="f-field">
             <label>Email Address</label>
             <div class="input-wrap">
-              <input type="email" id="login-email" value="demo@iitropar.ac.in">
+              <input type="email" id="login-email" value="iit@demo.com">
             </div>
           </div>
 
@@ -136,12 +136,18 @@
           </div>
 
           <div class="f-field">
-            <label>Login As</label>
+            <label>Demo Account</label>
 
-            <select id="login-role">
-              <option>Report Coordinator / Data Entry</option>
-              <option>Section Reviewer</option>
-              <option>System Administrator</option>
+            <select id="login-role" onchange="fillDemoLogin(this.value)">
+              <option value="iit@demo.com">IIT Ropar - Front Matter + Chapter 1-4 + Review</option>
+              <option value="sdo@demo.com">SDO - Chapter 5-10</option>
+              <option value="gis@demo.com">GIS - Plates + Graphs + Annexures + Review</option>
+              <option value="sdlc@demo.com">SDLC - District-level Data</option>
+              <option value="je@demo.com">JE - Field Data</option>
+              <option value="axen@demo.com">AXEN - Assigned Section</option>
+              <option value="reviewer1@gov.in">Reviewer 1 - Govt Review</option>
+              <option value="reviewer2@gov.in">Reviewer 2 - Govt Review</option>
+              <option value="admin@demo.com">Admin - Full Access</option>
             </select>
           </div>
           <div class="form-err" id="login-error" style="display:none; color:red; font-size:12px; margin-bottom:10px;">
@@ -199,14 +205,14 @@
           <div class="f-field">
             <label>SDLC ID / Email</label>
             <div class="input-wrap">
-              <input type="text" id="sdlc-email" value="sdlc@punjab.gov.in">
+              <input type="text" id="sdlc-email" value="sdlc@demo.com">
             </div>
           </div>
 
           <div class="f-field">
             <label>Password</label>
             <div class="input-wrap">
-              <input type="password" id="sdlc-pass" value="sdlc123">
+              <input type="password" id="sdlc-pass" value="password123">
             </div>
           </div>
 
@@ -408,111 +414,94 @@
 
 
 
-      <!-- TOPBAR -->
-    <div class="topbar" style="display: flex; flex-direction: column; justify-content: space-between; padding: 10px 28px !important; height: 110px !important; background: #17324D !important; border-bottom: 2px solid var(--p-accent-gold) !important; color: #ffffff !important; box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;">
-      
-      <!-- Top Branding Row -->
-      <div class="tb-brand-row" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <!-- Hamburger Menu Toggle Button -->
-          <button id="tb-sidebar-toggle" class="btn" style="display: none; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 6px; padding: 0; border: 1px solid rgba(255,255,255,0.25); color: #ffffff !important; background: rgba(255,255,255,0.05); cursor: pointer;" onclick="toggleSidebar()" title="Toggle Sidebar">
-            <i data-lucide="menu" style="width: 20px; height: 20px; color: #ffffff;"></i>
-          </button>
+  <!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-brand-row">
+    <div class="tb-brand-left">
+      <button id="tb-sidebar-toggle" class="tb-icon-btn tb-menu-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+        <i data-lucide="menu"></i>
+      </button>
 
-          <!-- Left Side: Circle Logo + Bilingual Gov Text -->
-          <div class="tb-logo-container" style="display: flex; align-items: center; gap: 14px; cursor: pointer;" onclick="clearActiveProject(); showView('dashboard', null);">
-            <div class="tb-gov-circle-logo" style="width: 44px; height: 44px; border-radius: 50%; background: #ffffff; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--p-accent-gold); box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-              <i data-lucide="landmark" style="width: 20px; height: 20px; color: #17324D;"></i>
-            </div>
-            <div class="tb-gov-texts" style="display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25;">
-              <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9.5px; font-weight: 800; color: #A5B4FC; letter-spacing: 0.8px; text-transform: uppercase;">Government of Punjab · EMGSM 2020 · IIT Ropar Research Cell</span>
-              <span style="font-family: 'Outfit', sans-serif; font-size: 19px; font-weight: 800; color: #FFFFFF; letter-spacing: 0.3px;">District Survey Report Automation Portal</span>
-              <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9.5px; font-weight: 700; color: var(--p-accent-gold); letter-spacing: 0.5px;">DSR Automation Portal — IIT Ropar · Punjab</span>
-            </div>
-          </div>
+      <div class="tb-logo-container" onclick="clearActiveProject(); showView('dashboard', null);">
+        <div class="tb-gov-circle-logo">
+          <i data-lucide="landmark"></i>
         </div>
-
-        <!-- Right Side: Utility Controls & Actions -->
-        <div class="tb-actions-container" style="display: flex; align-items: center; gap: 12px;">
-          <!-- Notification Bell -->
-          <div class="tb-nav-dropdown" style="position: relative;">
-            <div style="cursor: pointer; width: 34px; height: 34px; border-radius: 6px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; position: relative;" onclick="toggleNotificationDropdown()" title="Notifications">
-              <i data-lucide="bell" style="width: 16px; height: 16px; color: #ffffff;"></i>
-              <span id="tb-notif-dot" style="display: none; position: absolute; top: -1px; right: -1px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>
-            </div>
-            <div class="tb-dropdown-menu" id="tb-notif-dropdown" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 8px; width: 280px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 300;">
-              <div style="padding: 10px; font-weight: bold; border-bottom: 1px solid var(--border); background: var(--off); color: var(--text);">Notifications</div>
-              <div id="tb-notif-list" style="padding: 8px; color: var(--text-soft); font-size: 12px; text-align: center;">No new notifications</div>
-            </div>
-          </div>
-
-          <!-- E-Sign Button -->
-          <button class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; height: 34px; border-radius: 6px; padding: 0 14px; font-size: 12.5px; font-weight: 700; border: 1px solid rgba(255,255,255,0.25); color: #ffffff !important; background: rgba(255,255,255,0.05);" onclick="showView('esign',null)">
-            <i data-lucide="pen-tool" style="width: 13px; height: 13px;"></i>E-Sign
-          </button>
-
-          <!-- PDF Button -->
-          <button class="btn btn-outline btn-sm" style="display: inline-flex; align-items: center; gap: 6px; height: 34px; border-radius: 6px; padding: 0 14px; font-size: 12.5px; font-weight: 700; border: 1px solid rgba(255,255,255,0.25); color: #ffffff !important; background: rgba(255,255,255,0.05);" onclick="showView('generate',null)">
-            <i data-lucide="file-text" style="width: 13px; height: 13px;"></i>PDF
-          </button>
-
-          <!-- + New Project Button -->
-          <button id="tb-btn-new-project" class="btn btn-saffron btn-sm" style="display: inline-flex; align-items: center; gap: 4px; height: 34px; border-radius: 6px; padding: 0 14px; font-size: 12.5px; font-weight: 700; background: var(--p-accent-gold); color: #17324D !important; border: 1px solid var(--p-accent-gold);" onclick="newProjectModal()">
-            + New Project
-          </button>
-        </div>
-      </div>
-
-      <!-- Bottom Sub-Navigation Row -->
-      <div class="tb-sub-row" style="display: flex; align-items: center; justify-content: space-between; width: 100%; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
-        <!-- Left Side: Nav Tabs -->
-        <nav class="tb-nav" style="display: flex; align-items: center; gap: 20px;">
-          <!-- Dashboard Tab -->
-          <button class="tb-sub-nav-btn active" style="background: none; border: none; cursor: pointer; color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding-bottom: 6px; border-bottom: 2px solid var(--p-accent-gold);" onclick="clearActiveProject(); showView('dashboard',this)">
-            <i data-lucide="layout-dashboard" style="width: 14px; height: 14px; color: var(--p-accent-gold);"></i>Dashboard
-          </button>
-
-          <!-- Projects Dropdown Tab -->
-          <div class="tb-nav-dropdown" style="position: relative;">
-            <button class="tb-sub-nav-btn" style="background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.8); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding-bottom: 6px;" onclick="showView('projects',this)">
-              <i data-lucide="folder" style="width: 14px; height: 14px; color: rgba(255,255,255,0.6);"></i>Projects <i data-lucide="chevron-down" style="width: 12px; height: 12px; margin-left: 1px; color: rgba(255,255,255,0.6);"></i>
-            </button>
-            <div class="tb-dropdown-menu" id="tb-projects-dropdown" style="display: none; position: absolute; left: 0; top: 100%; margin-top: 8px; width: 180px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 300;">
-              <a href="#" onclick="showView('projects',null); return false;" style="display: block; padding: 10px 16px; font-size: 12.5px; font-weight: 600; color: var(--text); transition: background 0.2s;">View All Projects</a>
-              <a href="#" onclick="newProjectModal(); return false;" style="display: block; padding: 10px 16px; font-size: 12.5px; font-weight: 600; color: var(--text); transition: background 0.2s;">+ Add New Project</a>
-            </div>
-          </div>
-
-          <!-- Report Workflow Tab -->
-          <button class="tb-sub-nav-btn" style="background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.8); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding-bottom: 6px;" onclick="showView('workflow',this)">
-            <i data-lucide="git-pull-request" style="width: 14px; height: 14px; color: rgba(255,255,255,0.6);"></i>Report Workflow
-          </button>
-
-          <!-- Audit Logs Tab -->
-          <button id="tb-nav-audit-logs" class="tb-sub-nav-btn" style="display: none; background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.8); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700; align-items: center; gap: 6px; padding-bottom: 6px;" onclick="showView('audit-logs',this)">
-            <i data-lucide="clipboard-list" style="width: 14px; height: 14px; color: rgba(255,255,255,0.6);"></i>Audit Logs
-          </button>
-        </nav>
-
-        <!-- Right Side: Punjab Badge & Dark Mode Switcher -->
-        <div style="display: flex; align-items: center; gap: 16px;">
-          <!-- Punjab Badge -->
-          <span class="tb-district" id="tb-district-badge" style="background: var(--p-accent-gold) !important; color: #17324D !important; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 4px; letter-spacing: 0.5px; text-transform: uppercase;">Punjab</span>
-          
-          <!-- Dark Mode Icon Switcher -->
-          <label class="theme-switch-wrapper">
-            <div class="theme-switch" onclick="toggleDarkMode()" style="width: 34px; height: 20px; border-radius: 99px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); display: flex; align-items: center; padding: 2px; cursor: pointer; position: relative;">
-              <div class="theme-switch-slider" style="width: 14px; height: 14px; border-radius: 50%; background: var(--p-accent-gold); display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
-                <i data-lucide="moon" style="width: 10px; height: 10px; color: #fff;"></i>
-              </div>
-            </div>
-          </label>
+        <div class="tb-gov-texts">
+          <span>Government of Punjab - EMGSM 2020 - IIT Ropar Research Cell</span>
+          <strong>District Survey Report Automation Portal</strong>
+          <em>DSR Automation Portal - IIT Ropar - Punjab</em>
         </div>
       </div>
     </div>
 
+    <div class="tb-actions-container">
+      <div class="tb-nav-dropdown">
+        <button type="button" class="tb-icon-btn" onclick="toggleNotificationDropdown()" title="Notifications">
+          <i data-lucide="bell"></i>
+          <span id="tb-notif-dot"></span>
+        </button>
+        <div class="tb-dropdown-menu" id="tb-notif-dropdown">
+          <div class="tb-dropdown-title">Notifications</div>
+          <div id="tb-notif-list" class="tb-empty-note">No new notifications</div>
+        </div>
+      </div>
 
+      <button type="button" class="tb-icon-btn tb-theme-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode" data-theme-toggle>
+        <i data-lucide="moon"></i>
+      </button>
 
+      <button type="button" class="tb-action-pill" onclick="showView('esign', null)">
+        <i data-lucide="pen-tool"></i>
+        <span>E-Sign</span>
+      </button>
+
+      <button type="button" class="tb-action-pill" onclick="showView('generate', null)">
+        <i data-lucide="file-text"></i>
+        <span>PDF</span>
+      </button>
+
+      <button id="tb-btn-new-project" type="button" class="tb-action-pill tb-action-primary" onclick="newProjectModal()">
+        <i data-lucide="plus"></i>
+        <span>New Project</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="tb-sub-row">
+    <nav class="tb-nav">
+      <button type="button" class="tb-sub-nav-btn active" onclick="clearActiveProject(); showView('dashboard', this)">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </button>
+
+      <div class="tb-nav-dropdown">
+        <button type="button" class="tb-sub-nav-btn" onclick="showView('projects', this)">
+          <i data-lucide="folder"></i>
+          <span>Projects</span>
+          <i data-lucide="chevron-down"></i>
+        </button>
+        <div class="tb-dropdown-menu" id="tb-projects-dropdown">
+          <a href="#" onclick="showView('projects', null); return false;">View All Projects</a>
+          <a href="#" onclick="newProjectModal(); return false;">Add New Project</a>
+        </div>
+      </div>
+
+      <button type="button" class="tb-sub-nav-btn" onclick="showView('workflow', this)">
+        <i data-lucide="git-pull-request"></i>
+        <span>Report Workflow</span>
+      </button>
+
+      <button id="tb-nav-audit-logs" type="button" class="tb-sub-nav-btn" style="display:none" onclick="showView('audit-logs', this)">
+        <i data-lucide="clipboard-list"></i>
+        <span>Audit Logs</span>
+      </button>
+    </nav>
+
+    <div class="tb-status-actions">
+      <span class="tb-district" id="tb-district-badge">Punjab</span>
+    </div>
+  </div>
+</div>
 
   <!-- Mobile tab switcher (Editor / Preview) — visible on small screens when preview is active -->
   <div id="pdf-preview-mobile-tabs" class="pdf-preview-mobile-tabs" aria-hidden="true">
@@ -749,6 +738,28 @@
     .dash-action-icon-btn:hover {
       background: #F8FAFC;
       color: #17324D;
+    }
+
+    .dash-theme-toggle {
+      color: #17324D;
+      border-color: #C49A58;
+      background: #fffaf0;
+    }
+
+    .dash-theme-toggle:hover {
+      background: #C49A58;
+      color: #17324D;
+    }
+
+    html.dark .dash-theme-toggle {
+      background: #0B1E33;
+      color: #F8FAFC;
+      border-color: #C49A58;
+    }
+
+    html.dark .dash-theme-toggle:hover {
+      background: #17324D;
+      color: #F2A123;
     }
 
     .dash-btn-logout {
@@ -1811,12 +1822,10 @@
         <button class="dash-gov-badge dash-badge-emgsm" onclick="showView('workflow', null)">
           <i data-lucide="leaf" style="width:13px; height:13px;"></i> EMGSM 2020
         </button>
-        <button class="dash-gov-badge dash-badge-nic" onclick="showView('sdlc-portal', null)">
-          <i data-lucide="shield-check" style="width:13px; height:13px;"></i> NIC CERTIFIED
-        </button>
         <button class="dash-action-icon-btn" onclick="dashFocusSearch()" title="Search portal"><i data-lucide="search" style="width:16px; height:16px;"></i></button>
         <button class="dash-action-icon-btn" onclick="showView('sdlc-portal', null)"><i data-lucide="help-circle" style="width:16px; height:16px;"></i></button>
         <button class="dash-action-icon-btn" onclick="dashSharePortal()" title="Copy portal link"><i data-lucide="share-2" style="width:16px; height:16px;"></i></button>
+        <button class="dash-action-icon-btn dash-theme-toggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode" data-theme-toggle><i data-lucide="moon" style="width:16px; height:16px;"></i></button>
         <button onclick="doLogout()" class="dash-btn-logout">
           <i data-lucide="log-out" style="width:15px; height:15px; stroke-width: 2.5;"></i> Logout
         </button>
@@ -2329,6 +2338,7 @@
             <div>
               <div class="page-title">My DSR Projects</div>
               <div class="page-sub">All district survey reports across Punjab</div>
+              <div id="projects-load-status" style="margin-top:6px;font-size:12px;font-weight:800;color:var(--text-soft);"></div>
             </div>
             <div class="projects-header-actions">
               <button type="button" class="projects-dash-btn" onclick="clearActiveProject(); showView('dashboard', null)">
@@ -5474,65 +5484,40 @@
         </div>
 
 
-              <!-- ═══ USER MANAGEMENT ═══ -->
-        <div id="view-users" class="view">
-          <div class="header-row">
-            <div>
-              <div class="page-title">User Management</div>
-              <div class="page-sub">Manage portal users, roles, permissions, and section access</div>
-            </div>
-            <button class="btn btn-saffron btn-sm" onclick="toast('Add user form opened','info')">+ Add User</button>
-          </div>
-          <div class="card">
-            <div class="card-bd">
-              <div class="tbl-wrap">
-                <table class="tbl">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Email</th>
-                      <th>Role</th>
-                      <th>Department</th>
-                      <th>Status</th>
-                      <th>Last Login</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Rajinder Kumar</td>
-                      <td>rk@punjab.gov.in</td>
-                      <td><span class="badge badge-navy">SDO</span></td>
-                      <td>Revenue Dept., Jalandhar</td>
-                      <td><span class="badge badge-green">Active</span></td>
-                      <td>May 22, 2026</td>
-                      <td><button class="btn btn-xs btn-outline">Edit</button></td>
-                    </tr>
-                    <tr>
-                      <td>Dr. Suresh Verma</td>
-                      <td>sv@mining.punjab.gov.in</td>
-                      <td><span class="badge badge-teal">DMO</span></td>
-                      <td>Geology & Mining, Punjab</td>
-                      <td><span class="badge badge-green">Active</span></td>
-                      <td>May 21, 2026</td>
-                      <td><button class="btn btn-xs btn-outline">Edit</button></td>
-                    </tr>
-                    <tr>
-                      <td>Priya Sharma</td>
-                      <td>ps@iitropar.ac.in</td>
-                      <td><span class="badge badge-indigo">Reviewer</span></td>
-                      <td>IIT Ropar Research Cell</td>
-                      <td><span class="badge badge-green">Active</span></td>
-                      <td>May 22, 2026</td>
-                      <td><button class="btn btn-xs btn-outline">Edit</button></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- USER MANAGEMENT -->
+<div id="view-users" class="view">
+  <div class="header-row">
+    <div>
+      <div class="page-title">User Management</div>
+      <div class="page-sub">Manage portal users, roles, upload/review rights, and assigned access scopes</div>
+    </div>
+    <button class="btn btn-saffron btn-sm" onclick="openAddUserPrompt()">+ Add User</button>
+  </div>
 
+  <div class="card">
+    <div class="card-bd">
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Upload</th>
+              <th>Review</th>
+              <th>Access</th>
+              <th>Scope</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="users-table-body">
+            <tr><td colspan="8" style="text-align:center;">Loading users...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- templates/views/audit-logs.html -->
 <div class="view" id="view-audit-logs">
@@ -5975,39 +5960,40 @@
   <div class="toast" id="toast"></div>
 
   
-<script src="js/api.js"></script>
-<script src="js/state.js"></script>
-<script src="js/hierarchy.js"></script>
-<script src="js/navigation.js"></script>
-<script src="js/auth.js"></script>
-<script src="js/projects.js"></script>
-<script src="js/frontmatter.js"></script>
-<script src="js/chapters.js"></script>
-<script src="js/plates.js"></script>
-<script src="js/graphs.js"></script>
-<script src="js/tables.js"></script>
-<script src="js/anx1.js"></script>
-<script src="js/anx2.js"></script>
-<script src="js/anx3.js"></script>
-<script src="js/anx4.js"></script>
-<script src="js/anx5.js"></script>
-<script src="js/anx6.js"></script>
-<script src="js/anx7.js"></script>
-<script src="js/annexure-b.js"></script>
-<script src="js/annexure-c.js"></script>
-<script src="js/annexure-d.js"></script>
-<script src="js/annexure-e.js"></script>
-<script src="js/annexure-f.js"></script>
-<script src="js/annexure-g.js"></script>
-<script src="js/annexure-h.js"></script>
-<script src="js/annexure-i.js"></script>
-<script src="js/annexure-j.js"></script>
-<script src="js/annexure-k.js"></script>
-<script src="js/signatures.js"></script>
-<script src="js/pdf.js"></script>
-<script src="js/pdf-preview.js"></script>
-<script src="js/audit-logs.js"></script>
-<script src="js/sdlc.js"></script>
-<script src="js/main.js"></script>
+<script src="js/api.js?v=rbac-column-locks-20260609"></script>
+<script src="js/state.js?v=rbac-column-locks-20260609"></script>
+<script src="js/hierarchy.js?v=rbac-column-locks-20260609"></script>
+<script src="js/navigation.js?v=rbac-column-locks-20260609"></script>
+<script src="js/auth.js?v=rbac-column-locks-20260609"></script>
+<script src="js/projects.js?v=rbac-column-locks-20260609"></script>
+<script src="js/frontmatter.js?v=rbac-column-locks-20260609"></script>
+<script src="js/chapters.js?v=rbac-column-locks-20260609"></script>
+<script src="js/plates.js?v=rbac-column-locks-20260609"></script>
+<script src="js/graphs.js?v=rbac-column-locks-20260609"></script>
+<script src="js/users.js?v=rbac-column-locks-20260609"></script>
+<script src="js/tables.js?v=rbac-column-locks-20260609"></script>
+<script src="js/anx1.js?v=rbac-column-locks-20260609"></script>
+<script src="js/anx2.js?v=rbac-column-locks-20260609"></script>
+<script src="js/anx3.js?v=rbac-column-locks-20260609"></script>
+<script src="js/anx4.js?v=rbac-column-locks-20260609"></script>
+<script src="js/anx5.js?v=rbac-column-locks-20260609"></script>
+<script src="js/anx6.js?v=rbac-column-locks-20260609"></script>
+<script src="js/anx7.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-b.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-c.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-d.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-e.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-f.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-g.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-h.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-i.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-j.js?v=rbac-column-locks-20260609"></script>
+<script src="js/annexure-k.js?v=rbac-column-locks-20260609"></script>
+<script src="js/signatures.js?v=rbac-column-locks-20260609"></script>
+<script src="js/pdf.js?v=rbac-column-locks-20260609"></script>
+<script src="js/pdf-preview.js?v=rbac-column-locks-20260609"></script>
+<script src="js/audit-logs.js?v=rbac-column-locks-20260609"></script>
+<script src="js/sdlc.js?v=rbac-column-locks-20260609"></script>
+<script src="js/main.js?v=rbac-column-locks-20260609"></script>
 </body>
 </html>

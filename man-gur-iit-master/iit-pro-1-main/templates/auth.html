@@ -94,7 +94,7 @@
           <div class="f-field">
             <label>Email Address</label>
             <div class="input-wrap">
-              <input type="email" id="login-email" value="demo@iitropar.ac.in">
+              <input type="email" id="login-email" value="iit@demo.com">
             </div>
           </div>
 
@@ -110,12 +110,18 @@
           </div>
 
           <div class="f-field">
-            <label>Login As</label>
+            <label>Demo Account</label>
 
-            <select id="login-role">
-              <option>Report Coordinator / Data Entry</option>
-              <option>Section Reviewer</option>
-              <option>System Administrator</option>
+            <select id="login-role" onchange="fillDemoLogin(this.value)">
+              <option value="iit@demo.com">IIT Ropar - Front Matter + Chapter 1-4 + Review</option>
+              <option value="sdo@demo.com">SDO - Chapter 5-10</option>
+              <option value="gis@demo.com">GIS - Plates + Graphs + Annexures + Review</option>
+              <option value="sdlc@demo.com">SDLC - District-level Data</option>
+              <option value="je@demo.com">JE - Field Data</option>
+              <option value="axen@demo.com">AXEN - Assigned Section</option>
+              <option value="reviewer1@gov.in">Reviewer 1 - Govt Review</option>
+              <option value="reviewer2@gov.in">Reviewer 2 - Govt Review</option>
+              <option value="admin@demo.com">Admin - Full Access</option>
             </select>
           </div>
           <div class="form-err" id="login-error" style="display:none; color:red; font-size:12px; margin-bottom:10px;">
@@ -173,14 +179,14 @@
           <div class="f-field">
             <label>SDLC ID / Email</label>
             <div class="input-wrap">
-              <input type="text" id="sdlc-email" value="sdlc@punjab.gov.in">
+              <input type="text" id="sdlc-email" value="sdlc@demo.com">
             </div>
           </div>
 
           <div class="f-field">
             <label>Password</label>
             <div class="input-wrap">
-              <input type="password" id="sdlc-pass" value="sdlc123">
+              <input type="password" id="sdlc-pass" value="password123">
             </div>
           </div>
 

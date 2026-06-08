@@ -16,6 +16,7 @@ const JS_FILES = [
   'js/chapters.js',
   'js/plates.js',
   'js/graphs.js',
+  'js/users.js',
   'js/tables.js',
   'js/anx1.js',
   'js/anx2.js',
@@ -41,6 +42,8 @@ const JS_FILES = [
   'js/sdlc.js',
   'js/main.js'
 ];
+
+const ASSET_VERSION = 'rbac-column-locks-20260609';
 
 function compile() {
   console.log('Compiling DSR Portal...');
@@ -77,7 +80,7 @@ function compile() {
 
     // 5. Append JS Script tag references
     JS_FILES.forEach(file => {
-      html += `\n<script src="${file}"></script>`;
+      html += `\n<script src="${file}?v=${ASSET_VERSION}"></script>`;
     });
 
     // 6. Close body and html
@@ -120,5 +123,3 @@ if (process.argv.includes('--watch')) {
 } else {
   compile();
 }
-
-

@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findByCreatedBy(Long createdBy);
+    List<Project> findByDistrictIgnoreCase(String district);
 
     @Transactional
     @Modifying

@@ -1,6 +1,14 @@
 // api.js - Centralized Backend Communication
 
-var API_BASE_URL = 'http://localhost:8080/api';
+var API_BASE_URL = (() => {
+    if (!window.location || window.location.protocol === 'file:') return 'http://localhost:8080/api';
+    var host = window.location.hostname;
+    var port = window.location.port;
+    if ((host === 'localhost' || host === '127.0.0.1') && port && port !== '8080') {
+        return 'http://localhost:8080/api';
+    }
+    return `${window.location.origin}/api`;
+})();
 
 async function apiFetch(endpoint, options = {}) {
     const token = localStorage.getItem('dsr_token');

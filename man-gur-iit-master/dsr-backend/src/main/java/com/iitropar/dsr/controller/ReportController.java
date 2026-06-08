@@ -2,6 +2,9 @@ package com.iitropar.dsr.controller;
 import com.iitropar.dsr.dto.WorkflowRequest;
 import com.iitropar.dsr.entity.Report;
 import com.iitropar.dsr.entity.ReportStatus;
+import com.iitropar.dsr.entity.User;
+import com.iitropar.dsr.repository.UserRepository;
+import com.iitropar.dsr.service.PermissionService;
 import com.iitropar.dsr.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/reports")
 public class ReportController {
     @Autowired ReportService service;
+    @Autowired UserRepository userRepository;
+    @Autowired PermissionService permissionService;
 
     private Long getCurrentUserId() {
         Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -21,9 +26,13 @@ public class ReportController {
         throw new RuntimeException("User not authenticated");
     }
 
+    private User getCurrentUser() {
+        return userRepository.findById(getCurrentUserId()).orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
     @PostMapping
-    @PreAuthorize("hasAnyRole('DATA_ENTRY', 'OFFICER')")
     public ResponseEntity<?> createReport(@RequestBody Report report) {
+        permissionService.requireUpload(getCurrentUser());
         return ResponseEntity.ok(service.createReport(report, getCurrentUserId()));
     }
 
@@ -34,11 +43,19 @@ public class ReportController {
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam ReportStatus status) {
+        permissionService.requireReview(getCurrentUser());
         return ResponseEntity.ok(service.updateReportStatus(id, status));
     }
 
     @PostMapping("/{id}/workflow")
     public ResponseEntity<?> processWorkflow(@PathVariable Long id, @RequestBody WorkflowRequest request) {
+        User actor = getCurrentUser();
+        String action = request.getAction() == null ? "" : request.getAction().trim().toUpperCase();
+        if (action.equals("RETURN") || action.equals("REJECT") || action.equals("APPROVE") || action.equals("FORWARD")) {
+            permissionService.requireReview(actor);
+        } else if (action.equals("SUBMIT") || action.equals("DEO_REPLY") || action.equals("SDLC_RECONCILE")) {
+            permissionService.requireUpload(actor);
+        }
         return ResponseEntity.ok(service.processWorkflowAction(id, request, getCurrentUserId()));
     }
 

@@ -31,6 +31,12 @@ public class PDFUploadController {
     private ProjectRepository projectRepository;
 
     @Autowired
+    private com.iitropar.dsr.repository.UserRepository userRepository;
+
+    @Autowired
+    private com.iitropar.dsr.service.PermissionService permissionService;
+
+    @Autowired
     private com.iitropar.dsr.service.ReportService reportService;
 
     @Value("${minio.bucketName}")
@@ -46,10 +52,23 @@ public class PDFUploadController {
         return null;
     }
 
+    private com.iitropar.dsr.entity.User getCurrentUser() {
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof com.iitropar.dsr.security.UserDetailsImpl details) {
+            return userRepository.findById(details.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+        }
+        throw new RuntimeException("User not authenticated");
+    }
+
     @PostMapping("/upload-pdf")
     public ResponseEntity<?> uploadPDF(@RequestBody UploadRequest request) {
         Map<String, Object> response = new HashMap<>();
         try {
+            com.iitropar.dsr.entity.User actor = getCurrentUser();
+            permissionService.requireUpload(actor);
+            Project uploadProject = projectRepository.findById(request.getProjectId()).orElseThrow(() -> new RuntimeException("Project not found"));
+            permissionService.requireProjectAccess(actor, uploadProject);
+
             String objectName = request.getAnnexureId() + "-" + request.getProjectId() + ".pdf";
             Long userId = getCurrentUserId();
             if (userId == null) userId = 1L;

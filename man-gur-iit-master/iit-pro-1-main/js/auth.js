@@ -49,6 +49,13 @@ function toggleSignUp(show) {
   }
 }
 
+function fillDemoLogin(username) {
+  const emailEl = document.getElementById('login-email');
+  const passEl = document.getElementById('login-pass');
+  if (emailEl && username) emailEl.value = username;
+  if (passEl) passEl.value = 'password123';
+}
+
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value;
@@ -67,40 +74,40 @@ async function doLogin() {
       
       const backendRole = data.role || 'ROLE_OFFICER';
       S.backendRole = backendRole;
+      S.permissions = data.permissions || [];
+      S.scope = data.scope || {};
+      S.accessLabel = data.accessLabel || '';
       
       let uiRole = 'user';
-      const roleSelect = document.getElementById('login-role');
-      const selectedDropdownRole = roleSelect ? roleSelect.value : '';
-
-      if (selectedDropdownRole.includes('Reviewer')) {
-          uiRole = 'reviewer';
-      } else if (selectedDropdownRole.includes('Administrator') || backendRole.includes('ADMIN')) {
+      if (backendRole.includes('ADMIN')) {
           uiRole = 'admin';
+      } else if (backendRole.includes('SDLC')) {
+          uiRole = 'sdlc';
       } else if (backendRole.includes('DISTRICT_OWNER')) {
           uiRole = 'authority';
-      } else if (backendRole.includes('REVIEWER')) {
+      } else if (backendRole.includes('REVIEWER') || backendRole.includes('STATE_ADMIN') || backendRole.includes('IIT_ROPAR') || backendRole.includes('GIS')) {
           uiRole = 'reviewer';
       }
       
-      S.user = { name: data.username, email: email, role: uiRole, district: district };
+      S.user = {
+          name: data.fullName || data.username,
+          email: data.email || email,
+          role: uiRole,
+          backendRole,
+          district: data.scope?.district || district,
+          scope: data.scope || {},
+          accessLabel: data.accessLabel || ''
+      };
       S.role = uiRole;
+      if (typeof currentDistrictFilter !== 'undefined') currentDistrictFilter = 'ALL';
       
-      if (uiRole === 'authority' || uiRole === 'admin') {
-          await showAppScreen();
-      } else {
-          await showAppScreen();
-          if (district && district !== 'ALL') {
-              setTimeout(() => {
-                  const filterDropdown = document.getElementById('dash-district-filter');
-                  if (filterDropdown) {
-                      filterDropdown.value = district;
-                      if (typeof filterDashboardByDistrict === 'function') {
-                          filterDashboardByDistrict(district);
-                      }
-                  }
-              }, 100);
-          }
-      }
+      await showAppScreen();
+      setTimeout(() => {
+          const filterDropdown = document.getElementById('dash-district-filter');
+          if (filterDropdown) filterDropdown.value = 'ALL';
+          if (typeof filterDashboardByDistrict === 'function') filterDashboardByDistrict('ALL');
+          if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
+      }, 100);
   } catch (error) {
       err.style.display='block'; 
       err.textContent = error.message || 'Login failed. Please check credentials.';
@@ -161,6 +168,7 @@ async function doSignup() {
 }
 
 function doLogout() {
+  localStorage.removeItem('dsr_token');
   if (typeof clearActiveProject === 'function') {
     clearActiveProject();
   }
@@ -194,14 +202,30 @@ async function doSdlcLogin() {
   if (!email || !pass) { err.style.display='block'; err.textContent='Please fill all fields.'; return; }
   err.style.display='none';
   
-  if (email === 'sdlc@punjab.gov.in' && pass === 'sdlc123') {
-    localStorage.setItem('dsr_token', 'demo_sdlc_token');
-    S.user = { name: 'SDLC Committee', email: email, role: 'sdlc', district: 'Jalandhar' };
+  try {
+    const data = await apiFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username: email, password: pass })
+    });
+    localStorage.setItem('dsr_token', data.token);
+    S.backendRole = data.role || 'ROLE_SDLC';
+    S.permissions = data.permissions || [];
+    S.scope = data.scope || {};
+    S.accessLabel = data.accessLabel || '';
+    S.user = {
+      name: data.fullName || data.username || 'SDLC Committee',
+      email: data.email || email,
+      role: 'sdlc',
+      backendRole: S.backendRole,
+      district: data.scope?.district || 'Jalandhar',
+      scope: data.scope || {},
+      accessLabel: data.accessLabel || ''
+    };
     S.role = 'sdlc';
     await showAppScreen();
-  } else {
+  } catch (error) {
     err.style.display='block';
-    err.textContent='Invalid SDLC credentials. Use sdlc@punjab.gov.in / sdlc123.';
+    err.textContent = error.message || 'Invalid SDLC credentials.';
   }
 }
 
@@ -217,7 +241,8 @@ async function showAppScreen() {
   document.getElementById('sb-uname').textContent = S.user.name;
   
   const isSdlc = S.role === 'sdlc';
-  document.getElementById('sb-urole').textContent = S.role==='admin'?'System Admin':S.role==='reviewer'?'Section Reviewer':isSdlc?'SDLC Committee':'Report Coordinator';
+  const roleLabel = (typeof getRoleRule === 'function') ? getRoleRule().label : (S.role==='admin'?'System Admin':S.role==='reviewer'?'Section Reviewer':isSdlc?'SDLC Committee':'Report Coordinator');
+  document.getElementById('sb-urole').textContent = S.accessLabel || roleLabel;
   
   // Toggle visibility of admin sections in the sidebar
   const navAuditLogs = document.getElementById('nav-audit-logs');
@@ -257,6 +282,10 @@ async function showAppScreen() {
   } else if (targetView === 'sdlc-portal') {
     targetView = 'dashboard';
   }
+
+  if (typeof hasModuleAccess === 'function' && !hasModuleAccess(targetView)) {
+    targetView = typeof getFirstAllowedView === 'function' ? getFirstAllowedView() : 'dashboard';
+  }
   
   if (targetView && document.getElementById('view-' + targetView)) {
     showView(targetView, null, false);
@@ -265,6 +294,7 @@ async function showAppScreen() {
   }
 
   if (window.initLucide) initLucide();
+  if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
 }
 
 function showAuthorityScreen() {

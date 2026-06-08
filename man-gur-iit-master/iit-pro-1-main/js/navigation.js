@@ -51,23 +51,19 @@ window.addEventListener('popstate', (event) => {
 });
 
 async function initApp() {
+  if (typeof currentDistrictFilter !== 'undefined' && !S.activeProject) currentDistrictFilter = 'ALL';
   try {
-    const data = await apiFetch('/projects');
-    // Map backend project entities to frontend S.projects format
-    S.projects = data.map(p => ({
-      id: p.id,
-      title: p.projectName,
-      district: p.district,
-      year: '2025-26', // Default or parse from backend if added
-      mineral: 'Sand',
-      rivers: 'Not specified',
-      progress: 0,
-      status: p.status === 'IN_PROGRESS' ? 'In Progress' : p.status,
-      createdAt: p.createdAt ? new Date(p.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A',
-      signatures: 0
-    }));
+    if (typeof refreshProjectsFromBackend === 'function') {
+      await refreshProjectsFromBackend(false);
+    } else {
+      const data = await apiFetch('/projects');
+      S.projects = Array.isArray(data) ? data : (Array.isArray(data?.value) ? data.value : []);
+      S.projectLoadError = '';
+    }
   } catch (err) {
     console.error('Failed to load projects from backend:', err);
+    S.projectLoadError = err.message || 'Failed to load projects from backend';
+    if (typeof toast === 'function') toast('Projects could not load: ' + S.projectLoadError, 'error');
   }
 
   // Fetch reports for Notifications and Workflow
@@ -93,6 +89,7 @@ async function initApp() {
   }
 
   renderDashboard(); renderProjects(); renderChapters(); renderPlates();
+  if (typeof updateRolePermissionUI === 'function') updateRolePermissionUI();
   initDemandTable(); initSummaryTable(); initAuctionTable();
   renderSignatures(); renderFinalChecklist();
   renderGraphs(); // Ensure graphs exist so plates can link to them
@@ -346,6 +343,15 @@ function repairMainContentStructure() {
 
 function showView(id, btn, push = true) {
   repairMainContentStructure();
+  if (typeof hasModuleAccess === 'function' && typeof S !== 'undefined' && S.user && !hasModuleAccess(id)) {
+    if (typeof showUnauthorizedAccessError === 'function') showUnauthorizedAccessError();
+    else if (typeof toast === 'function') toast('You are not authorized to access this section.', 'error');
+    else alert('You are not authorized to access this section.');
+    if (window.location.hash !== '#' + currentViewId) {
+      history.replaceState({ viewId: currentViewId }, '', '#' + currentViewId);
+    }
+    return;
+  }
   // Hide flyout menus whenever a main view changes
   document.querySelectorAll('.flyout-menu').forEach(m => m.style.display = 'none');
 
@@ -441,6 +447,10 @@ function showView(id, btn, push = true) {
   if (id === 'generate') renderFinalChecklist();
   if (id === 'plates') renderPlates(); // Re-render in case new graphs were added
   if (id === 'workflow') updateWorkflowDistrictUI();
+  if (id === 'projects' && typeof refreshProjectsFromBackend === 'function') {
+    refreshProjectsFromBackend(true).catch(err => console.error('Project refresh failed', err));
+  }
+  if (id === 'users' && typeof renderUsers === 'function') renderUsers();
   if (id === 'benchmark-table' && typeof mountBenchmarkPanel === 'function') mountBenchmarkPanel('benchmark-table-content');
   if (id === 'anx1' && typeof renderPdfUploadUIAnx1 === 'function') renderPdfUploadUIAnx1();
   if (id === 'anx2' && typeof renderPdfUploadUIAnx2 === 'function') renderPdfUploadUIAnx2();

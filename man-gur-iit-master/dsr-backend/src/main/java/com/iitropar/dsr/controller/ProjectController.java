@@ -1,5 +1,8 @@
 package com.iitropar.dsr.controller;
 import com.iitropar.dsr.entity.Project;
+import com.iitropar.dsr.entity.User;
+import com.iitropar.dsr.repository.UserRepository;
+import com.iitropar.dsr.service.PermissionService;
 import com.iitropar.dsr.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,15 +13,23 @@ import org.springframework.web.bind.annotation.*;
 public class ProjectController {
     @Autowired ProjectService service;
     @Autowired com.iitropar.dsr.service.ReportService reportService;
+    @Autowired UserRepository userRepository;
+    @Autowired PermissionService permissionService;
+
+    private User getCurrentUser() {
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof com.iitropar.dsr.security.UserDetailsImpl details) {
+            return userRepository.findById(details.getId()).orElseThrow(() -> new RuntimeException("User not found"));
+        }
+        throw new RuntimeException("User not authenticated");
+    }
 
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Project p) {
-        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long actorId = null;
-        if (principal instanceof com.iitropar.dsr.security.UserDetailsImpl) {
-            actorId = ((com.iitropar.dsr.security.UserDetailsImpl) principal).getId();
-            p.setCreatedBy(actorId);
-        }
+        User actor = getCurrentUser();
+        permissionService.requireManageProjects(actor);
+        Long actorId = actor.getId();
+        p.setCreatedBy(actorId);
         Project created = service.createProject(p);
         
         reportService.recordWorkflowHistory(
@@ -33,22 +44,33 @@ public class ProjectController {
 
     @GetMapping
     public ResponseEntity<?> getAll() {
-        return ResponseEntity.ok(service.getAll());
+        User actor = getCurrentUser();
+        return ResponseEntity.ok(service.getAllVisibleTo(actor));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getById(id));
+        User actor = getCurrentUser();
+        Project project = service.getById(id);
+        permissionService.requireProjectAccess(actor, project);
+        return ResponseEntity.ok(project);
     }
 
     @PutMapping("/{id}/state")
     public ResponseEntity<?> updateState(@PathVariable Long id, @RequestBody java.util.Map<String, String> payload) {
+        User actor = getCurrentUser();
+        Project project = service.getById(id);
+        if (!permissionService.canUpdateProjectState(actor, project)) {
+            throw new org.springframework.security.access.AccessDeniedException("Update access denied for this project");
+        }
         String state = payload.get("state");
         return ResponseEntity.ok(service.updateProjectState(id, state));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteProject(@PathVariable Long id) {
+        User actor = getCurrentUser();
+        permissionService.requireManageProjects(actor);
         service.deleteProject(id);
         return ResponseEntity.ok(java.util.Map.of("message", "Project deleted successfully"));
     }

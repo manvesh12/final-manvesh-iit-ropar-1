@@ -108,7 +108,7 @@ public class ReportService {
             Role userRole = currentUser.getRole();
 
             // 1. DATA_ENTRY or OFFICER -> REVIEWER
-            if ((currentStatus == ReportStatus.DRAFT || currentStatus == ReportStatus.RETURNED) && (userRole == Role.DATA_ENTRY || userRole == Role.OFFICER)) {
+            if ((currentStatus == ReportStatus.DRAFT || currentStatus == ReportStatus.RETURNED) && isUploadWorkflowRole(userRole)) {
                 if (action.equals("SUBMIT") && currentStatus == ReportStatus.RETURNED) {
                     Project project = projectRepository.findById(report.getProjectId()).orElse(null);
                     if (project != null && project.getProjectState() != null && project.getProjectState().equals(project.getLastReviewedState())) {
@@ -123,16 +123,16 @@ public class ReportService {
                 if (report.getSubmittedBy() == null) report.setSubmittedBy(currentUser.getId());
             }
             // 2. REVIEWER -> PENDING_DC
-            else if (currentStatus == ReportStatus.PENDING_REVIEWER && userRole == Role.REVIEWER) {
+            else if (currentStatus == ReportStatus.PENDING_REVIEWER && isReviewWorkflowRole(userRole)) {
                 report.setStatus(ReportStatus.PENDING_DC);
                 report.setReviewedBy(currentUser.getId());
             }
             // 3. DISTRICT_OWNER -> STATE_ADMIN
-            else if (currentStatus == ReportStatus.PENDING_DC && userRole == Role.DISTRICT_OWNER) {
+            else if (currentStatus == ReportStatus.PENDING_DC && (userRole == Role.DISTRICT_OWNER || userRole == Role.REVIEWER_1 || userRole == Role.REVIEWER_2 || userRole == Role.ADMIN)) {
                 report.setStatus(ReportStatus.PENDING_STATE_ADMIN);
             }
             // 4. STATE_ADMIN -> APPROVED
-            else if (currentStatus == ReportStatus.PENDING_STATE_ADMIN && userRole == Role.STATE_ADMIN) {
+            else if (currentStatus == ReportStatus.PENDING_STATE_ADMIN && (userRole == Role.STATE_ADMIN || userRole == Role.ADMIN)) {
                 report.setStatus(ReportStatus.APPROVED);
                 report.setApprovedBy(currentUser.getId());
             }
@@ -163,5 +163,15 @@ public class ReportService {
                 .performedBy(userId)
                 .build();
         historyRepository.save(history);
+    }
+
+    private boolean isUploadWorkflowRole(Role role) {
+        return role == Role.DATA_ENTRY || role == Role.OFFICER || role == Role.IIT_ROPAR || role == Role.SDLC
+                || role == Role.SDO || role == Role.JE || role == Role.AXEN || role == Role.GIS || role == Role.ADMIN;
+    }
+
+    private boolean isReviewWorkflowRole(Role role) {
+        return role == Role.REVIEWER || role == Role.REVIEWER_1 || role == Role.REVIEWER_2 || role == Role.IIT_ROPAR
+                || role == Role.GIS || role == Role.ADMIN || role == Role.STATE_ADMIN || role == Role.DISTRICT_OWNER;
     }
 }

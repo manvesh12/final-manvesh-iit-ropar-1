@@ -15,6 +15,9 @@ public class User {
     private String password;
     @Enumerated(EnumType.STRING) private Role role;
     private String district;
+    private String blockName;
+    private String sectionName;
+    private String accessScope;
     private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

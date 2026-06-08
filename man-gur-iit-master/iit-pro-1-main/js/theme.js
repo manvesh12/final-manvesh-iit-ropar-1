@@ -45,8 +45,13 @@ function toggleDarkMode() {
 function updateDarkModeIcon() {
   const isDark = document.documentElement.classList.contains('dark');
   const iconName = isDark ? 'sun' : 'moon';
-  document.querySelectorAll('[data-theme-toggle] i, #dark-mode-toggle i, #auth-theme-toggle i, #authority-theme-toggle i, .theme-switch i').forEach((icon) => {
+  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  document.querySelectorAll('[data-theme-toggle] i, #dark-mode-toggle i, #auth-theme-toggle i, #authority-theme-toggle i, .theme-switch i, .tb-theme-toggle i').forEach((icon) => {
     icon.setAttribute('data-lucide', iconName);
+  });
+  document.querySelectorAll('[data-theme-toggle], #dark-mode-toggle, #auth-theme-toggle, #authority-theme-toggle, .tb-theme-toggle').forEach((btn) => {
+    btn.setAttribute('aria-label', label);
+    btn.setAttribute('title', label);
   });
   if (window.lucide) window.lucide.createIcons();
 }
